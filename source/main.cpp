@@ -14,7 +14,7 @@ Vec3 colour(const Ray& ray, const Hitable& world, int depth)
 	{
 		Ray scattered;
 		Vec3 attenuation;
-		if(depth < 50 && rec.mat_ptr->Scatter(ray, rec, attenuation, scattered))
+		if(depth < 10 && rec.mat_ptr->Scatter(ray, rec, attenuation, scattered))
 		{
 			return attenuation * colour(scattered, world, depth+1);
 		}
@@ -39,19 +39,11 @@ void RandomScene(HitableList& list){
 			Vec3 center( a+ 0.9 * drand48(), 0.2, b + 0.9 * drand48());
 			if((center-Vec3(4,0.2,0)).length() > 0.9) {
 				if(choose_mat < 0.8) {
-					list.list.push_back(std::make_unique<Sphere>(center, 0.2, 
-							std::make_unique<Lambertian>(Vec3(drand48() * drand48(),
-							 drand48() * drand48(),
-							 drand48() * drand48()))));
+					list.list.push_back(std::make_unique<Sphere>(center, 0.2, std::make_unique<Lambertian>(Vec3(drand48() * drand48(), drand48() * drand48(), drand48() * drand48()))));
 				} else if(choose_mat < 0.95) {
-					list.list.push_back(std::make_unique<Sphere>(center, 0.2,
-						 std::make_unique<Metal>(Vec3(0.5 * (1+drand48()), 
-						 	0.5 * (1+drand48()),
-						 	0.5 * (1+drand48())),
-						 0.5 * drand48())));
+					list.list.push_back(std::make_unique<Sphere>(center, 0.2, std::make_unique<Metal>(Vec3(0.5 * (1+drand48()), 0.5 * (1+drand48()), 0.5 * (1+drand48())), 0.5 * drand48())));
 				} else {
-					list.list.push_back(std::make_unique<Sphere>(center, 0.2, 
-							std::make_unique<Dielectric>(1.5)));
+					list.list.push_back(std::make_unique<Sphere>(center, 0.2, std::make_unique<Dielectric>(1.5)));
 				}
 			}
 		}
@@ -64,36 +56,25 @@ void RandomScene(HitableList& list){
 
 int main() {
 
-	int nx = 600;
-	int ny = 400;
-	int ns = 20;
+	int nx = 300;
+	int ny = 200;
+	int ns = 4;
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
 	HitableList world;
-	Vec3 lookfrom(0,3,1);
+	Vec3 lookfrom(2,6,1);
 	Vec3 lookat(0,0,-1);
-	float dist_to_focus = (lookfrom - lookat).length();
-	float aperture = 1.0;
 
-	float R = cos(M_PI / 4);
-	//world.list.push_back(std::make_unique<Sphere>(Vec3(-R,0,-1), R, std::make_unique<Lambertian>(Vec3(0.0, 0.0, 1))));
-	//world.list.push_back(std::make_unique<Sphere>(Vec3(R,0,-1), R, std::make_unique<Lambertian>(Vec3(1, 0.0, 0.0))));
-
-	world.list.push_back(std::make_unique<Sphere>(Vec3(0,0,-1), 0.5, std::make_unique<Lambertian>(Vec3(0.1, 0.2, 0.5))));
-	world.list.push_back(std::make_unique<Sphere>(Vec3(0,-100.5,-1), 100, std::make_unique<Lambertian>(Vec3(0.8, 0.8, 0.0))));
-	world.list.push_back(std::make_unique<Sphere>(Vec3(-1,0,-1), 0.5, std::make_unique<Metal>(Vec3(0.8, 0.6, 0.2), 1.0)));
-	world.list.push_back(std::make_unique<Sphere>(Vec3(-1,0,-1), 0.5, std::make_unique<Dielectric>(1.5)));
-	world.list.push_back(std::make_unique<Sphere>(Vec3(-1,0,-1), -0.45, std::make_unique<Dielectric>(1.5)));
+	world.list.push_back(std::make_unique<Sphere>(Vec3(-1.5, 0.0, -1), 0.5, std::make_unique<Lambertian>(Vec3(0.1, 0.2, 0.5))));
+	world.list.push_back(std::make_unique<Sphere>(Vec3(1, -100.5, -1), 100, std::make_unique<Lambertian>(Vec3(0.8, 0.8, 0.0))));
+	world.list.push_back(std::make_unique<Sphere>(Vec3(1.5, 0.0, -1), 0.5, std::make_unique<Metal>(Vec3(0.8, 0.6, 0.2), 1.0)));
+	world.list.push_back(std::make_unique<Sphere>(Vec3(0.0, 0.0, -1), 0.5, std::make_unique<Dielectric>(1.5)));
+	world.list.push_back(std::make_unique<Sphere>(Vec3(-1, 0.0, -5), 3.45, std::make_unique<Lambertian>(Vec3(0.6, 0.4, 5.5))));
 
 
 	RandomScene(world);
-	//world.list.push_back(Vec3(0,0,-1), 0.5, std::make_unique<Lambertian>(Vec3(0.1, 0.2, 0.5)));
-	//world.list.push_back(Vec3(0,-100.5,-1), 100, std::make_unique<Lambertian>(Vec3(0.8, 0.8, 0.0)));
-	//world.list.push_back(Vec3(1,0,-1), 0.5, std::make_unique<Metal>(Vec3(0.8, 0.6, 0.2)));
-	//world.list.push_back(Vec3(-1,0,-1), 0.5, std::make_unique<Dielectric>(1.5));
 
-	//Camera cam(Vec3(-2,2,1), Vec3(0,0,-1), Vec3(0,1,0), 20, float(nx)/float(ny));
-	Camera cam(lookfrom, lookat, Vec3(0,1,0), 90, float(nx)/float(ny), aperture, dist_to_focus);
+	Camera cam(lookfrom, lookat, Vec3(0,1,0), 90, float(nx)/float(ny));
 
 	for(int j = ny-1; j >= 0; j--){
 		for(int i = 0; i < nx; i++){
