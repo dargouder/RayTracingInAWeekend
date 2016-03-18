@@ -15,7 +15,7 @@ public:
 
 	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered) const {
 		Vec3 reflected = reflect(Vec3::unit_vector(r_in.direction()), rec.normal);
-		scattered = Ray(rec.p, reflected + fuzz *RandomInUnitSphere());
+		scattered = Ray(rec.p, reflected + fuzz * RandomInUnitSphere());
 		attenuation = albedo;
 
 		return (Vec3::dot(scattered.direction(), rec.normal) > 0);

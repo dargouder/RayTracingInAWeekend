@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/dargouder/Documents/RayTracingInAWeekend/source/main.cpp" "/home/dargouder/Documents/RayTracingInAWeekend/CMakeFiles/RTIAW.dir/source/main.cpp.o"
+  "/home/dargouder/Documents/RayTracingInAWeekend/source/transform.cpp" "/home/dargouder/Documents/RayTracingInAWeekend/CMakeFiles/RTIAW.dir/source/transform.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

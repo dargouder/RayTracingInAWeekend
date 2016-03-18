@@ -9,7 +9,15 @@ CMakeFiles/RTIAW.dir/source/main.cpp.o
  /home/dargouder/Documents/RayTracingInAWeekend/source/lambertian.h
  /home/dargouder/Documents/RayTracingInAWeekend/source/main.cpp
  /home/dargouder/Documents/RayTracingInAWeekend/source/material.h
+ /home/dargouder/Documents/RayTracingInAWeekend/source/matrix4x4.h
  /home/dargouder/Documents/RayTracingInAWeekend/source/metal.h
  /home/dargouder/Documents/RayTracingInAWeekend/source/ray.h
  /home/dargouder/Documents/RayTracingInAWeekend/source/sphere.h
+ /home/dargouder/Documents/RayTracingInAWeekend/source/transform.h
+ /home/dargouder/Documents/RayTracingInAWeekend/source/vec3.h
+CMakeFiles/RTIAW.dir/source/transform.cpp.o
+ /home/dargouder/Documents/RayTracingInAWeekend/source/matrix4x4.h
+ /home/dargouder/Documents/RayTracingInAWeekend/source/ray.h
+ /home/dargouder/Documents/RayTracingInAWeekend/source/transform.cpp
+ /home/dargouder/Documents/RayTracingInAWeekend/source/transform.h
  /home/dargouder/Documents/RayTracingInAWeekend/source/vec3.h

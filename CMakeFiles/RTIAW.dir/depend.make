@@ -8,8 +8,16 @@ CMakeFiles/RTIAW.dir/source/main.cpp.o: source/hitable_list.h
 CMakeFiles/RTIAW.dir/source/main.cpp.o: source/lambertian.h
 CMakeFiles/RTIAW.dir/source/main.cpp.o: source/main.cpp
 CMakeFiles/RTIAW.dir/source/main.cpp.o: source/material.h
+CMakeFiles/RTIAW.dir/source/main.cpp.o: source/matrix4x4.h
 CMakeFiles/RTIAW.dir/source/main.cpp.o: source/metal.h
 CMakeFiles/RTIAW.dir/source/main.cpp.o: source/ray.h
 CMakeFiles/RTIAW.dir/source/main.cpp.o: source/sphere.h
+CMakeFiles/RTIAW.dir/source/main.cpp.o: source/transform.h
 CMakeFiles/RTIAW.dir/source/main.cpp.o: source/vec3.h
+
+CMakeFiles/RTIAW.dir/source/transform.cpp.o: source/matrix4x4.h
+CMakeFiles/RTIAW.dir/source/transform.cpp.o: source/ray.h
+CMakeFiles/RTIAW.dir/source/transform.cpp.o: source/transform.cpp
+CMakeFiles/RTIAW.dir/source/transform.cpp.o: source/transform.h
+CMakeFiles/RTIAW.dir/source/transform.cpp.o: source/vec3.h
 

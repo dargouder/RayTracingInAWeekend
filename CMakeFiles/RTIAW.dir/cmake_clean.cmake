@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/RTIAW.dir/source/main.cpp.o"
+  "CMakeFiles/RTIAW.dir/source/transform.cpp.o"
   "RTIAW.pdb"
   "RTIAW"
 )

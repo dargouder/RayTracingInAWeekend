@@ -150,6 +150,33 @@ source/main.cpp.s:
 	$(MAKE) -f CMakeFiles/RTIAW.dir/build.make CMakeFiles/RTIAW.dir/source/main.cpp.s
 .PHONY : source/main.cpp.s
 
+source/transform.o: source/transform.cpp.o
+
+.PHONY : source/transform.o
+
+# target to build an object file
+source/transform.cpp.o:
+	$(MAKE) -f CMakeFiles/RTIAW.dir/build.make CMakeFiles/RTIAW.dir/source/transform.cpp.o
+.PHONY : source/transform.cpp.o
+
+source/transform.i: source/transform.cpp.i
+
+.PHONY : source/transform.i
+
+# target to preprocess a source file
+source/transform.cpp.i:
+	$(MAKE) -f CMakeFiles/RTIAW.dir/build.make CMakeFiles/RTIAW.dir/source/transform.cpp.i
+.PHONY : source/transform.cpp.i
+
+source/transform.s: source/transform.cpp.s
+
+.PHONY : source/transform.s
+
+# target to generate assembly for a file
+source/transform.cpp.s:
+	$(MAKE) -f CMakeFiles/RTIAW.dir/build.make CMakeFiles/RTIAW.dir/source/transform.cpp.s
+.PHONY : source/transform.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,6 +189,9 @@ help:
 	@echo "... source/main.o"
 	@echo "... source/main.i"
 	@echo "... source/main.s"
+	@echo "... source/transform.o"
+	@echo "... source/transform.i"
+	@echo "... source/transform.s"
 .PHONY : help
 
 
