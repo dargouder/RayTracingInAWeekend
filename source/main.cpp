@@ -31,12 +31,12 @@ Vec3 colour(const Ray& ray, const Hitable& world, int depth)
 }
 
 void RandomScene(HitableList& list) {
-	int n = 500;
+
 	list.list.push_back(std::make_unique<Sphere>(Vec3(0, -1000, 0), 1000,
 		std::make_unique<Lambertian>(Vec3(0.5, 0.5, 0.5))));
 
-	for (int a = -11; a < 11; a++) {
-		for (int b = -11; b < 11; b++) {
+	for (int a = -10; a < 10; a++) {
+		for (int b = -10; b < 10; b++) {
 			float choose_mat = RAND();
 			Vec3 center(a + 0.9 * RAND(), 0.2, b + 0.9 * RAND());
 			if ((center - Vec3(4, 0.2, 0)).length() > 0.9) {
@@ -61,40 +61,46 @@ void RandomScene(HitableList& list) {
 int main() {
 	std::ofstream os;
 	os.open("image6.ppm", std::ios::binary);
-	int nx = 1920;
-	int ny = 1080;
-	int ns = 100;
+	int nx = 800;
+	int ny = 600;
+	int ns = 5;
 	//os << "P3\n" << nx << " " << ny << "\n255\n";
 
-	os << "P6" << std::endl;
+	//os << "P6" << std::endl;
+	os << "P3" << std::endl;
 	os << nx << " " << ny << std::endl;
 	os << "255" << std::endl;
 
 	HitableList world;
 
-	world.list.push_back(std::make_unique<Sphere>(Vec3(-1.5, 0.0, -1), 0.5, std::make_unique<Lambertian>(Vec3(0.1, 0.2, 0.5))));
+	//world.list.push_back(std::make_unique<Sphere>(Vec3(-1.5, 0.0, -1), 0.5, std::make_unique<Lambertian>(Vec3(0.1, 0.2, 0.5))));
 	//world.list.push_back(std::make_unique<Sphere>(Vec3(1, -100.5, -1), 100, std::make_unique<Lambertian>(Vec3(0.8, 0.8, 0.0))));
-	world.list.push_back(std::make_unique<Sphere>(Vec3(1.5, 0.0, -1), 0.5, std::make_unique<Metal>(Vec3(0.8, 0.6, 0.2), 1.0)));
-	world.list.push_back(std::make_unique<Sphere>(Vec3(0.0, 0.0, -1), 0.5, std::make_unique<Dielectric>(1.5)));
+	//world.list.push_back(std::make_unique<Sphere>(Vec3(1.5, 0.0, -1), 0.5, std::make_unique<Metal>(Vec3(0.8, 0.6, 0.2), 1.0)));
+	//world.list.push_back(std::make_unique<Sphere>(Vec3(0.0, 0.0, -1), 0.5, std::make_unique<Dielectric>(1.5)));
 	//world.list.push_back(std::make_unique<Sphere>(Vec3(-1, 0.0, -5), 3.45, std::make_unique<Lambertian>(Vec3(0.6, 0.4, 5.5))));
 
 
 	RandomScene(world);
 
-	Camera cam(nx, ny, 90, Vec3(-6, 3, -5));
+	//Camera cam(nx, ny, 30, Vec3(-6, 3, -15));
 
-	//for (int j = ny - 1; j >= 0; j--) {
-		//for (int i = 0; i < nx; i++) {
+	Vec3 lookfrom(13, 2,3), lookat(0, 0.0,0);
+	float dist_to_focus = 10.0;
+	float aperture = 0.0;
+	Camera cam(lookfrom, lookat, Vec3(0, 1, 0), 20, float(nx / ny), aperture, dist_to_focus);
 
-	for (int j = 0; j < ny; j++) {
-		for (int i = nx - 1; i >= 0; i--) {
+	for (int j = ny - 1; j >= 0; j--) {
+		for (int i = 0; i < nx; i++) {
+
+	//for (int j = 0; j < ny; j++) {
+		//for (int i = nx - 1; i >= 0; i--) {
 			Vec3 col(0.0, 0.0, 0.0);
 			for (int s = 0; s < ns; s++) {
-				double u = double(i + RAND());
-				double v = double(j + RAND());
+				double u = double(i + RAND()) /float(nx);
+				double v = double(j + RAND()) /float(ny);
 
-				Ray r = cam.GenerateRay(u, v);
-
+				//Ray r = cam.GenerateRay(u, v);
+				Ray r = cam.GetRay(u, v);
 				Vec3 p = r.point_at_parameter(2.0);
 				col += colour(r, world, 0);
 			}
@@ -105,12 +111,13 @@ int main() {
 			int ig = int(255.99*col[1]);
 			int ib = int(255.99*col[2]);
 
-			unsigned char red = static_cast<unsigned char>(std::min(1.f, col[0]) * 255);
-			unsigned char green = static_cast<unsigned char>(std::min(1.f, col[1]) * 255);
-			unsigned char blue = static_cast<unsigned char>(std::min(1.f, col[2]) * 255);
+			//unsigned char red = static_cast<unsigned char>(std::min(1.f, col[0]) * 255);
+			//unsigned char green = static_cast<unsigned char>(std::min(1.f, col[1]) * 255);
+			//unsigned char blue = static_cast<unsigned char>(std::min(1.f, col[2]) * 255);
 
-			//os << ir << " " << ig << " " << ib << "\n";
-			os << red << green << blue;
+			
+			os << ir << " " << ig << " " << ib << "\n";
+			//os << red << green << blue;
 		}
 	}
 

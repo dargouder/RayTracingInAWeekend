@@ -7,7 +7,15 @@
 
 inline double RAND()
 {
-	return (double(rand()) / RAND_MAX);
+#ifdef _WIN32
+	float rt = 0.0;
+	rt = (float)(rand() % 1000);
+	rt /= 1000;
+
+	return rt;
+#else
+	return drand48();
+#endif
 }
 
 inline float schlick(float cosine, float ref_idx) {
@@ -20,7 +28,7 @@ inline float schlick(float cosine, float ref_idx) {
 
 #ifdef __linux__
 #else
-const int M_PI = 3.14159265358979323846;
+const float M_PI = 3.14159265358979323846;
 #endif
 class Vec3 {
 public:
@@ -156,7 +164,7 @@ public:
 
 	inline static Vec3 cross(const Vec3& v1, const Vec3& v2) {
 		return Vec3((v1.e[1] * v2.e[2]) - (v1.e[2] * v2.e[1]),
-			-(v1.e[0] * v2.e[2]) - (v1.e[2] * v2.e[0]),
+			-((v1.e[0] * v2.e[2]) - (v1.e[2] * v2.e[0])),
 			(v1.e[0] * v2.e[1]) - (v1.e[1] * v2.e[0])
 
 			);

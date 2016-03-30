@@ -1,8 +1,0 @@
-#include <iostream>
-#include "../include/test/student.h"
-
-void Student::write_string(){
-
-	std::cout << "just a string" << std::endl;
-
-}
