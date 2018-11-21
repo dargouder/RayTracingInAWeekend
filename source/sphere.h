@@ -24,6 +24,7 @@ public:
 				rec.t = temp;
 				rec.p = r.point_at_parameter(rec.t);
 				rec.normal = (rec.p - center) / radius;
+                rec.normal.make_unit_vector();
 				rec.mat_ptr = material.get();
 				return true;
 			}
@@ -33,6 +34,7 @@ public:
 				rec.t = temp;
 				rec.p = r.point_at_parameter(rec.t);
 				rec.normal = (rec.p - center) / radius;
+                rec.normal.make_unit_vector();
 				rec.mat_ptr = material.get();
 				return true;
 			}

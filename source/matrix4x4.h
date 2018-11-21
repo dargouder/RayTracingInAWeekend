@@ -2,6 +2,8 @@
 #pragma once
 #include <cstring>
 #include <algorithm>
+#include <stdio.h>
+#include <math.h>
 
 inline float det3(float a, float b, float c,
 	float d, float e, float f,

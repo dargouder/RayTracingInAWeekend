@@ -26,10 +26,10 @@ inline float schlick(float cosine, float ref_idx) {
 }
 
 
-#ifdef __linux__
-#else
-const float M_PI = 3.14159265358979323846;
-#endif
+//#ifdef __linux__
+//#else
+//const float M_PI = 3.14159265358979323846;
+//#endif
 class Vec3 {
 public:
 	float e[3];
