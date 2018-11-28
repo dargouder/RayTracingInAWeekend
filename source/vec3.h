@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 
-
+const float M_PI = 3.142;
 inline double RAND()
 {
 #ifdef _WIN32

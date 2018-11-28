@@ -20,4 +20,6 @@ public:
 
 		return (Vec3::dot(scattered.direction(), rec.normal) > 0);
 	}
+
+  virtual Vec3 emitted(float u, float v, const Vec3& p) const { return Vec3(0, 0, 0); }
 };

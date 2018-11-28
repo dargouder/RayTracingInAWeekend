@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++14 -g   CMakeFiles/RTIAW.dir/source/main.cpp.o CMakeFiles/RTIAW.dir/source/transform.cpp.o  -o RTIAW -rdynamic 

@@ -16,6 +16,8 @@ public:
 		return true;
 	}
 
+  virtual Vec3 emitted(float u, float v, const Vec3& p) const { return Vec3(0,0,0); }
+
 	Vec3 albedo;
 
 };

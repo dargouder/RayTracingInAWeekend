@@ -6,23 +6,29 @@
 #include "metal.h"
 #include "quad.h"
 #include "sphere.h"
+#include "diffuselight.h"
+
 #include <fstream>
 #include <iostream>
+
 Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
   HitRecord rec;
   if (world.hit(ray, 0.001, FLT_MAX, rec)) {
     Ray scattered;
     Vec3 attenuation;
+    float u, v;
+    Vec3 emitted = rec.mat_ptr->emitted(u, v, rec.p);
     if (depth < 10 && rec.mat_ptr->Scatter(ray, rec, attenuation, scattered)) {
-      return attenuation * colourRecursive(scattered, world, depth + 1);
+      return emitted + attenuation * colourRecursive(scattered, world, depth + 1);
+    }
+    else
+    {
+      return emitted;
     }
 
-    return Vec3(0, 0, 0);
 
   } else {
-    Vec3 unit_direction = Vec3::unit_vector(ray.direction());
-    float t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
+    return Vec3(0, 0, 0);
   }
 }
 
@@ -36,14 +42,18 @@ Vec3 colour(const Ray &ray, const Hitable &world, int depth) {
     if (world.hit(r, 0.001, FLT_MAX, rec)) {
       Ray scattered;
       Vec3 attenuation;
+      float u, v;
+      Vec3 emitted = rec.mat_ptr->emitted(u, v, rec.p);
       if (rec.mat_ptr->Scatter(r, rec, attenuation, scattered)) {
         currentAttenuation *= attenuation;
+        currentAttenuation += emitted;
         r = scattered;
       } else {
-        return Vec3(0, 0, 0);
+        return emitted; //Vec3(0, 0, 0);
       }
 
     } else {
+      return Vec3(0, 0, 0);
       Vec3 unit_direction = Vec3::unit_vector(r.direction());
       float t = 0.5f * (unit_direction.y() + 1.0f);
       Vec3 col = (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
@@ -116,19 +126,19 @@ void MISScene(HitableList &list) {
   // Lights
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(10.0f, 10.0f, 4.0f), 0.5,
-      std::make_unique<Lambertian>(Vec3(1.0, 1.0, 1.0))));
+      std::make_unique<DiffuseLight>(Vec3(80.0, 80.0, 80.0))));
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(-1.25f, 0.0f, 0.0f), 0.1,
-      std::make_unique<Lambertian>(Vec3(1.0, 1.0, 1.0))));
+      std::make_unique<DiffuseLight>(Vec3(10.0, 10.0, 10.0))));
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(-3.75f, 0.0f, 0.0f), 0.03333f,
-      std::make_unique<Lambertian>(Vec3(1.0, 1.0, 1.0))));
+      std::make_unique<DiffuseLight>(Vec3(90.0, 90.0, 90.0))));
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(1.25f, 0.0f, 0.0f), 0.3f,
-      std::make_unique<Lambertian>(Vec3(1.0, 1.0, 1.0))));
+      std::make_unique<DiffuseLight>(Vec3(1.0f, 1.0f, 1.0f))));
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(3.75f, 0.0f, 0.0f), 0.9f,
-      std::make_unique<Lambertian>(Vec3(1.0, 1.0, 1.0))));
+      std::make_unique<DiffuseLight>(Vec3(1.0f, 1.0f, 1.0f))));
 
   // Floor
   list.list.push_back(std::make_unique<Quad>(
@@ -163,15 +173,15 @@ void MISScene(HitableList &list) {
   list.list.push_back(std::make_unique<Quad>(
       Vec3(-4.0f, -3.99615f, 4.0667f), Vec3(4.0f, -3.99615f, 4.0667f),
       Vec3(4.0f, -3.82069f, 3.08221f), Vec3(-4.0f, -3.82069f, 3.08221f),
-      std::make_unique<Metal>(Vec3(1.0, 1.0, 1.0), 0.1f)));
+      std::make_unique<Metal>(Vec3(1.0, 1.0, 1.0), 0.125f)));
 }
 
 int main() {
   std::ofstream os;
   os.open("mis.ppm", std::ios::binary);
-  int nx = 768;
+  int nx = 512;
   int ny = 512;
-  int ns = 10;
+  int ns = 64; 
 
   os << "P3" << std::endl;
   os << nx << " " << ny << std::endl;
@@ -181,7 +191,7 @@ int main() {
 
   MISScene(world);
   // RandomScene(world);
-  Vec3 lookfrom(0.0f, 2.0f, 15.0f), lookat(0.0f, -2.0f, 2.5f);
+  Vec3 lookfrom(0.0f, 2.0f, 75.0f), lookat(0.0f, -2.0f, 2.5f);
 
   // Vec3 lookfrom(13.0f, 2.0f, 3.0f), lookat(0.0f, 0.0f, 0.0f);
   float dist_to_focus = (lookfrom - lookat).length();
@@ -199,15 +209,18 @@ int main() {
         double v = float(j + RAND()) / float(ny);
 
         Ray r = cam.GetRay(u, v);
-        col += colour(r, world, 0);
+        col += colourRecursive(r, world, 0);
       }
 
       col /= float(ns);
+      //col[0] = col[0] > 1 ? 1 : col[0];
+      //col[1] = col[1] > 1 ? 1 : col[1];
+      //col[2] = col[2] > 1 ? 1 : col[2];
       col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
-      int ir = int(255.99 * col[0]);
-      int ig = int(255.99 * col[1]);
-      int ib = int(255.99 * col[2]);
 
+      int ir = int(255.99 * col[0]) > 256 ? 256 : int(255.99 * col[0]);
+      int ig = int(255.99 * col[1]) > 256 ? 256 : int(255.99 * col[1]);
+      int ib = int(255.99 * col[2]) > 256 ? 256 : int(255.99 * col[2]);
       os << ir << " " << ig << " " << ib << "\n";
     }
   }
