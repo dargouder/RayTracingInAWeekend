@@ -126,16 +126,16 @@ void MISScene(HitableList &list) {
   // Lights
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(10.0f, 10.0f, 4.0f), 0.5,
-      std::make_unique<DiffuseLight>(Vec3(80.0, 80.0, 80.0))));
+      std::make_unique<DiffuseLight>(Vec3(800.0, 800.0, 800.0))));
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(-1.25f, 0.0f, 0.0f), 0.1,
-      std::make_unique<DiffuseLight>(Vec3(10.0, 10.0, 10.0))));
+      std::make_unique<DiffuseLight>(Vec3(100.0, 100.0, 100.0))));
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(-3.75f, 0.0f, 0.0f), 0.03333f,
-      std::make_unique<DiffuseLight>(Vec3(90.0, 90.0, 90.0))));
+      std::make_unique<DiffuseLight>(Vec3(900.0, 900.0, 900.0))));
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(1.25f, 0.0f, 0.0f), 0.3f,
-      std::make_unique<DiffuseLight>(Vec3(1.0f, 1.0f, 1.0f))));
+      std::make_unique<DiffuseLight>(Vec3(10.0f, 10.0f, 10.0f))));
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(3.75f, 0.0f, 0.0f), 0.9f,
       std::make_unique<DiffuseLight>(Vec3(1.0f, 1.0f, 1.0f))));
@@ -181,7 +181,7 @@ int main() {
   os.open("mis.ppm", std::ios::binary);
   int nx = 512;
   int ny = 512;
-  int ns = 64; 
+  int ns = 256;
 
   os << "P3" << std::endl;
   os << nx << " " << ny << std::endl;
@@ -191,7 +191,7 @@ int main() {
 
   MISScene(world);
   // RandomScene(world);
-  Vec3 lookfrom(0.0f, 2.0f, 75.0f), lookat(0.0f, -2.0f, 2.5f);
+  Vec3 lookfrom(0.0f, 2.0f, 15.0f), lookat(0.0f, -2.0f, 2.5f);
 
   // Vec3 lookfrom(13.0f, 2.0f, 3.0f), lookat(0.0f, 0.0f, 0.0f);
   float dist_to_focus = (lookfrom - lookat).length();
@@ -213,14 +213,14 @@ int main() {
       }
 
       col /= float(ns);
-      //col[0] = col[0] > 1 ? 1 : col[0];
-      //col[1] = col[1] > 1 ? 1 : col[1];
-      //col[2] = col[2] > 1 ? 1 : col[2];
+      col[0] = col[0] > 1 ? 1 : col[0];
+      col[1] = col[1] > 1 ? 1 : col[1];
+      col[2] = col[2] > 1 ? 1 : col[2];
       col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
 
-      int ir = int(255.99 * col[0]) > 256 ? 256 : int(255.99 * col[0]);
-      int ig = int(255.99 * col[1]) > 256 ? 256 : int(255.99 * col[1]);
-      int ib = int(255.99 * col[2]) > 256 ? 256 : int(255.99 * col[2]);
+      int ir = int(255.99 * col[0]);// > 256 ? 256 : int(255.99 * col[0]);
+      int ig = int(255.99 * col[1]);// > 256 ? 256 : int(255.99 * col[1]);
+      int ib = int(255.99 * col[2]);// > 256 ? 256 : int(255.99 * col[2]);
       os << ir << " " << ig << " " << ib << "\n";
     }
   }

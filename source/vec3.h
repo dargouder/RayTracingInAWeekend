@@ -3,11 +3,14 @@
 #include <cmath>
 #include <cstdlib>
 
-
+#ifdef _WIN32
 const float M_PI = 3.142;
+#endif
+
 inline double RAND()
 {
 #ifdef _WIN32
+
 	float rt = 0.0;
 	rt = (float)(rand() % 1000);
 	rt /= 1000;
