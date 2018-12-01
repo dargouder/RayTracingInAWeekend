@@ -7,8 +7,9 @@ void BeckmannShadowMasking(Vec3 v, Vec3 m, Vec3 n)
     float dot_vn = Vec3::dot(v, n);
 
     // theta_v is the angle between v and n
-    float theta_v =
-    float a = alpha_b * tan()
+    float cos_theta_v = dot_vn / (v.length() * n.length());
+    float theta_v = acos(cos_theta_v);
+    float a = 1.0f / (alpha_b * tan(theta_v));
 }
 
 void BeckmannDistribution(Vec3 n, float u, float v, float alpha_b)
@@ -21,7 +22,7 @@ void BeckmannDistribution(Vec3 n, float u, float v, float alpha_b)
     float dot_mn = Vec3::dot(m, n);
     float chi = dot_mn > 0 ? 1 : 0;
 
-    auto D_m = chi / (M_PI * alpha_b * alpha_b * powf(cos(theta_m), 4)) * exp(-powf(tan(theta_m)) / (alpha_b * alpha_b));
+    auto D_m = chi / (M_PI * alpha_b * alpha_b * powf(cos(theta_m), 4)) * exp(-powf(tan(theta_m), 2) / (alpha_b * alpha_b));
 
     // G(i,o,m) = G_1 (i,m) * G_1(o,m)
     // G_1 is the shadow masking function
