@@ -6,7 +6,6 @@ class Microfacet : public Material {
   Microfacet(const Vec3 kd, const Vec3 ks, const float alpha_b)
       : m_kd(kd), m_ks(ks), m_alpha_b(alpha_b) {}
 
-
   float FresnelTerm(Vec3 i, Vec3 m) const
   {
     float c = abs(Vec3::dot(i, m));
@@ -22,11 +21,12 @@ class Microfacet : public Material {
     float gpc = g+c;
     float gmc = g-c;
 
-    float num = (c * gpc - 1) * ( c * gpc - 1);
-    float den = (c * gmc - 1) * ( c * gmc - 1);
 
-    float F = 0.5f * ( gmc*gmc / gpc*gpc ) * ( 1.0f + num / den );
+    //auto D_m = chi / (M_PI * alpha_b * alpha_b * powf(cos(theta_m), 4)) * exp(-powf(tan(theta_m), 2) / (alpha_b * alpha_b));
 
+
+    //float F = 0.5f * ( gmc*gmc / gpc*gpc ) * ( 1.0f + num / den );
+	float F = 0;
     return F;
   }
 
