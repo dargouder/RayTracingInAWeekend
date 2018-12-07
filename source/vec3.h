@@ -181,9 +181,6 @@ public:
 		return v / v.length();
 	}
 
-
-
-
 };
 
 inline Vec3 RandomInUnitDisk() {

@@ -10,7 +10,7 @@ public:
 
 	}
 
-	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered) const {
+	virtual bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered) const {
 		Vec3 outward_normal;
 		Vec3 reflected = reflect(r_in.direction(), rec.normal);
 		float ni_over_nt;
@@ -45,5 +45,10 @@ public:
 		return true;
 	}
 
-  virtual Vec3 emitted(float u, float v, const Vec3& p) const { return Vec3(0,0,0); }
+  virtual Vec3 Le(float u, float v, const Vec3& p) const { return Vec3(0,0,0); }
+
+  float Pdf(float theta) const
+  {
+    return 1;
+  }
 };

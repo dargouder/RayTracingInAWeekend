@@ -1,12 +1,13 @@
 #include "camera.h"
 #include "dielectric.h"
+#include "diffuselight.h"
 #include "float.h"
 #include "hitable_list.h"
 #include "lambertian.h"
 #include "metal.h"
+#include "microfacet.h"
 #include "quad.h"
 #include "sphere.h"
-#include "diffuselight.h"
 
 #include <fstream>
 #include <iostream>
@@ -17,18 +18,20 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     Ray scattered;
     Vec3 attenuation;
     float u, v;
-    Vec3 emitted = rec.mat_ptr->emitted(u, v, rec.p);
-    if (depth < 10 && rec.mat_ptr->Scatter(ray, rec, attenuation, scattered)) {
-      return emitted + attenuation * colourRecursive(scattered, world, depth + 1);
-    }
-    else
-    {
+    Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
+    if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered)) {
+      return emitted +
+             attenuation * colourRecursive(scattered, world, depth + 1);
+    } else {
       return emitted;
     }
 
-
   } else {
-    return Vec3(0, 0, 0);
+    Vec3 unit_direction = Vec3::unit_vector(ray.direction());
+    float t = 0.5f * (unit_direction.y() + 1.0f);
+    Vec3 col = (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
+    return col;
+    ;
   }
 }
 
@@ -37,30 +40,31 @@ Vec3 colour(const Ray &ray, const Hitable &world, int depth) {
   Vec3 currentAttenuation = Vec3(1.0f, 1.0f, 1.0f);
   const int maxBounces = 10;
   for (int i = 0; i < maxBounces; ++i) {
-
     HitRecord rec;
     if (world.hit(r, 0.001, FLT_MAX, rec)) {
       Ray scattered;
       Vec3 attenuation;
       float u, v;
-      Vec3 emitted = rec.mat_ptr->emitted(u, v, rec.p);
-      if (rec.mat_ptr->Scatter(r, rec, attenuation, scattered)) {
-        currentAttenuation *= attenuation;
+      Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
+      if (rec.mat_ptr->fr(r, rec, attenuation, scattered)) {
+        scattered.direction().make_unit_vector();
+        rec.normal.make_unit_vector();
+        float theta = Vec3::dot(scattered.direction(), rec.normal);
+        currentAttenuation *= attenuation / rec.mat_ptr->Pdf(theta) * cos(theta);
         currentAttenuation += emitted;
         r = scattered;
       } else {
-        return emitted; //Vec3(0, 0, 0);
+        return emitted;  // Vec3(0, 0, 0);
       }
 
     } else {
-      return Vec3(0, 0, 0);
       Vec3 unit_direction = Vec3::unit_vector(r.direction());
       float t = 0.5f * (unit_direction.y() + 1.0f);
       Vec3 col = (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
       return currentAttenuation * col;
     }
   }
-  return Vec3(0.0f, 0.0f, 0.0f);
+  return currentAttenuation;
 }
 
 Vec3 colourNormal(const Ray &ray, const Hitable &world, int depth) {
@@ -84,7 +88,6 @@ Vec3 colourNormal(const Ray &ray, const Hitable &world, int depth) {
 }
 
 void RandomScene(HitableList &list) {
-
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(0, -1000, 0), 1000,
       std::make_unique<Lambertian>(Vec3(0.5, 0.5, 0.5))));
@@ -102,10 +105,10 @@ void RandomScene(HitableList &list) {
         } else if (choose_mat < 0.95) {
           list.list.push_back(std::make_unique<Sphere>(
               center, 0.2,
-              std::make_unique<Metal>(Vec3(0.5 * (1 + RAND()),
-                                           0.5 * (1 + RAND()),
-                                           0.5 * (1 + RAND())),
-                                      0.5 * RAND())));
+              std::make_unique<Metal>(
+                  Vec3(0.5 * (1 + RAND()), 0.5 * (1 + RAND()),
+                       0.5 * (1 + RAND())),
+                  0.5 * RAND())));
         } else {
           list.list.push_back(std::make_unique<Sphere>(
               center, 0.2, std::make_unique<Dielectric>(1.5)));
@@ -116,12 +119,28 @@ void RandomScene(HitableList &list) {
 
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(0, 1, 0), 1.0, std::make_unique<Dielectric>(1.5)));
-  list.list.push_back(std::make_unique<Sphere>(
-      Vec3(-4, 1, 0), 1.0, std::make_unique<Lambertian>(Vec3(0.4, 0.2, 0.1))));
+  ;
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(4, 1, 0), 1.0, std::make_unique<Metal>(Vec3(0.7, 0.6, 0.5), 0.0)));
 }
+void SimpleScene(HitableList &list) {
+  list.list.push_back(std::make_unique<Quad>(
+      Vec3(-10.0f, -1.2f, 10.0f), Vec3(10.0f, -1.2f, 10.0f),
+      Vec3(10.0f, -1.2f, -10.0f), Vec3(-10.0f, -1.2f, -10.0f),
+      std::make_unique<Lambertian>(Vec3(0.4f, 0.4f, 0.4f))));
+  list.list.push_back(std::make_unique<Sphere>(
+      Vec3(0, 0, -20), 1.0,
+		std::make_unique<Lambertian>(Vec3(0.8, 0.1, 0.1))));
+//  list.list.push_back(std::make_unique<Sphere>(
+//      Vec3(0, 0, 0), 1.0,
+//      std::make_unique<Dielectric>(1.5f)));
+  list.list.push_back(std::make_unique<Sphere>(
+      Vec3(0, 0, 0), 1.0, std::make_unique<Metal>(Vec3(1.0, 1.0, 1.0), 0.0)));
 
+  //  list.list.push_back(std::make_unique<Sphere>(
+  //   Vec3(0, 0, 0), 1.0, std::make_unique<Microfacet>(Vec3(0.8, 0.1, 0.1),
+  //   Vec3(1.0, 1.0f, 1.0f), 0.52f)));
+}
 void MISScene(HitableList &list) {
   // Lights
   list.list.push_back(std::make_unique<Sphere>(
@@ -181,7 +200,7 @@ int main() {
   os.open("mis.ppm", std::ios::binary);
   int nx = 512;
   int ny = 512;
-  int ns = 256;
+  int ns = 64;
 
   os << "P3" << std::endl;
   os << nx << " " << ny << std::endl;
@@ -189,27 +208,26 @@ int main() {
 
   HitableList world;
 
-  MISScene(world);
+  // MISScene(world);
+  SimpleScene(world);
   // RandomScene(world);
-  Vec3 lookfrom(0.0f, 2.0f, 15.0f), lookat(0.0f, -2.0f, 2.5f);
-
+  // Vec3 lookfrom(0.0f, 2.0f, 15.0f), lookat(0.0f, -2.0f, 2.5f);
+  Vec3 lookfrom(0.0f, 0.0f, -10.0f), lookat(0.0f, 0.0f, 0.0f);
   // Vec3 lookfrom(13.0f, 2.0f, 3.0f), lookat(0.0f, 0.0f, 0.0f);
   float dist_to_focus = (lookfrom - lookat).length();
-  float aperture = 0.1f;
+  float aperture = 0.0f;
   Camera cam(lookfrom, lookat, Vec3(0, 1, 0), 35, float(nx / ny), aperture,
              dist_to_focus);
 
   for (int j = ny - 1; j >= 0; j--) {
     for (int i = 0; i < nx; i++) {
-
       Vec3 col(0.0, 0.0, 0.0);
       for (int s = 0; s < ns; s++) {
-
         double u = float(i + RAND()) / float(nx);
         double v = float(j + RAND()) / float(ny);
 
         Ray r = cam.GetRay(u, v);
-        col += colourRecursive(r, world, 0);
+        col += colour(r, world, 0);
       }
 
       col /= float(ns);
@@ -218,9 +236,9 @@ int main() {
       col[2] = col[2] > 1 ? 1 : col[2];
       col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
 
-      int ir = int(255.99 * col[0]);// > 256 ? 256 : int(255.99 * col[0]);
-      int ig = int(255.99 * col[1]);// > 256 ? 256 : int(255.99 * col[1]);
-      int ib = int(255.99 * col[2]);// > 256 ? 256 : int(255.99 * col[2]);
+      int ir = int(255.99 * col[0]);  // > 256 ? 256 : int(255.99 * col[0]);
+      int ig = int(255.99 * col[1]);  // > 256 ? 256 : int(255.99 * col[1]);
+      int ib = int(255.99 * col[2]);  // > 256 ? 256 : int(255.99 * col[2]);
       os << ir << " " << ig << " " << ib << "\n";
     }
   }
