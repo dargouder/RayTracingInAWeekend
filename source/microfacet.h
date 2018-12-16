@@ -89,12 +89,12 @@ class Microfacet : public Material {
     macrosurface_normal.make_unit_vector();
 
 	float dot_i_n = Vec3::dot(incident_ray, microsurface_normal);
-	float dot_i_m = Vec3::dot(incident_ray, microsurface_normal);
+	float dot_i_m = Vec3::dot(incident_ray, microsurface_normal);
 
 	Vec3 transmitted_ray;
 	float tr_brdf, tr_pdf;
 
-	tr_calc(incident_ray, microsurface_normal, macrosurface_normal, dot_i_m, dot_i_n, transmitted_ray, &tr_brdf, &tr_pdf);
+	tr_calc(incident_ray, microsurfacenormal, macrosurface_normal, dot_i_m, dot_i_n, transmitted_ray, &tr_brdf, &tr_pdf);
 
 	
 	float ref_id = m_eta_in / m_eta_out;
