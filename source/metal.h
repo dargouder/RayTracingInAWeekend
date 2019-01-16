@@ -25,6 +25,7 @@ public:
 
   float Pdf(float theta) const
   {
-    return cos(theta) * fuzz / M_PI;
+	  return 1.0f;
+    //return cos(theta) * fuzz / M_PI;
   }
 };

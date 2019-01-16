@@ -1,9 +1,9 @@
 #pragma once
 #include "material.h"
 
-class Microfacet : public Material {
+class WalterMicrofacet : public Material {
  public:
-  Microfacet(const Vec3 kd, const Vec3 ks, const float alpha_b)
+  WalterMicrofacet(const Vec3 kd, const Vec3 ks, const float alpha_b)
       : m_kd(kd), m_ks(ks), m_alpha_b(alpha_b) {}
 
   float FresnelTerm(const float &dot_i_m, const float &refr_index_ratio) const
@@ -36,7 +36,7 @@ class Microfacet : public Material {
                  const Vec3& macro_normal, Vec3& reflected_ray, float& brdf,
                  float& pdf) 
   {
-    Vec3 reflected_ray = 2.0f * Vec3::dot(incident_ray, micro_normal) *
+    reflected_ray = 2.0f * Vec3::dot(incident_ray, micro_normal) *
                              micro_normal -
                          incident_ray;
     reflected_ray.make_unit_vector();
@@ -64,8 +64,8 @@ class Microfacet : public Material {
     float dot_o_h = Vec3::dot(transmitted_ray, trans_half_normal);
 	float dot_o_n = Vec3::dot(transmitted_ray, macro_normal);
 
-	brdf = ((abs(dot_i_h) * abs(dot_o_h)) / (abs(dot_i_n) * abs(dot_o_n))) * (m_eta_out* m_eta_out) * 
-		(1 - FresnelTerm(dot_i_h, refractive_index_ratio)) * BeckmannShadowMasking(incident_ray, transmitted_ray, trans_half_normal) * BeckmannDistribution(macro_normal, trans_half_normal, theta_m);
+	//brdf = ((abs(dot_i_h) * abs(dot_o_h)) / (abs(dot_i_n) * abs(dot_o_n))) * (m_eta_out* m_eta_out) * 
+	//	(1 - FresnelTerm(dot_i_h, refractive_index_ratio)) * BeckmannShadowMasking(incident_ray, transmitted_ray, trans_half_normal) * BeckmannDistribution(macro_normal, trans_half_normal, theta_m);
     float den_jacobian = m_eta_in * dot_i_h + m_eta_out * dot_o_h;    
 	float trans_jacobian = m_eta_out * m_eta_out * abs(dot_o_h) / (den_jacobian * den_jacobian);
   }
@@ -94,7 +94,7 @@ class Microfacet : public Material {
 	Vec3 transmitted_ray;
 	float tr_brdf, tr_pdf;
 
-	tr_calc(incident_ray, microsurfacenormal, macrosurface_normal, dot_i_m, dot_i_n, transmitted_ray, &tr_brdf, &tr_pdf);
+	//tr_calc(incident_ray, microsurfacenormal, macrosurface_normal, dot_i_m, dot_i_n, transmitted_ray, &tr_brdf, &tr_pdf);
 
 	
 	float ref_id = m_eta_in / m_eta_out;
@@ -102,18 +102,18 @@ class Microfacet : public Material {
     //float c = acos(abs(Vec3::dot(incident_ray, reflection_half_vec)));
 
 	//Vec3 o_t = ref_id * c;
-    float G = BeckmannShadowMasking(incident_ray, reflection_half_vec, macrosurface_normal);
-    float D = BeckmannDistribution(reflection_half_vec, macrosurface_normal, theta_m);
+    //float G = BeckmannShadowMasking(incident_ray, reflection_half_vec, macrosurface_normal);
+   // float D = BeckmannDistribution(reflection_half_vec, macrosurface_normal, theta_m);
 
     //float F = FresnelTerm(i, h_r);
    // float F = schlick(c, 2.0f);
 
-    float diffuse_brdf = F * G * D /  (4 * abs(Vec3::dot(incident_ray, macrosurface_normal)) * abs(Vec3::dot(reflected_ray, macrosurface_normal)));
-    float specular_brdf = abs(Vec3::dot(incident_ray, transmitted_ray)) * abs(Vec3::dot(reflected_ray, transmitted_ray)) / 
+    //float diffuse_brdf = F * G * D /  (4 * abs(Vec3::dot(incident_ray, macrosurface_normal)) * abs(Vec3::dot(reflected_ray, macrosurface_normal)));
+    //float specular_brdf = abs(Vec3::dot(incident_ray, transmitted_ray)) * abs(Vec3::dot(reflected_ray, transmitted_ray)) 
 
 	//float specular_brdf;
 
-    scattered = Ray(rec.p, reflected_ray);
+    //scattered = Ray(rec.p, reflected_ray);
     attenuation = m_kd;
 
     return true;

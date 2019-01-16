@@ -5,7 +5,7 @@
 #include "hitable_list.h"
 #include "lambertian.h"
 #include "metal.h"
-#include "microfacet.h"
+#include "waltermicrofacet.h"
 #include "quad.h"
 #include "sphere.h"
 
@@ -138,7 +138,7 @@ void SimpleScene(HitableList &list) {
       Vec3(0, 0, 0), 1.0, std::make_unique<Metal>(Vec3(1.0, 1.0, 1.0), 0.0)));
 
   //  list.list.push_back(std::make_unique<Sphere>(
-  //   Vec3(0, 0, 0), 1.0, std::make_unique<Microfacet>(Vec3(0.8, 0.1, 0.1),
+  //   Vec3(0, 0, 0), 1.0, std::make_unique<WalterMicrofacet>(Vec3(0.8, 0.1, 0.1),
   //   Vec3(1.0, 1.0f, 1.0f), 0.52f)));
 }
 void MISScene(HitableList &list) {
