@@ -138,7 +138,7 @@ void SimpleScene(HitableList &list) {
 
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(0, 0, 0), 1.0,
-		std::make_unique<Phong>(Vec3(0.7, 0.7, 0.7), Vec3(0.2, 0.2, 0.2))));
+		std::make_unique<Phong>(Vec3(0.0f, 0.0f, 0.0f), Vec3(1.0f, 1.0f, 1.0f))));
 
 //  list.list.push_back(std::make_unique<Sphere>(
 //      Vec3(0, 0, 0), 1.0,

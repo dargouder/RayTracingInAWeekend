@@ -5,7 +5,7 @@ class Phong : public Material {
 
 public:
   Phong(const Vec3& a, const Vec3& ks) : m_kd(a), m_ks(ks) {
-    n = 30;
+    n = 300000;
   }
 
   bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered, float& pdf) const {
@@ -61,7 +61,7 @@ public:
 
     alpha = fmax(alpha, 2 * M_PI);
     
-    attenuation = m_kd / M_PI + m_ks * ( n+ 2) / (2* M_PI) * pow(cos(alpha), n);
+    attenuation = m_kd / M_PI + m_ks * ( n + 2) / (2* M_PI) * pow(cos(alpha), n);
 
     return true;
   }
