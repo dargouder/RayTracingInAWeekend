@@ -4,14 +4,17 @@
 class Lambertian : public Material {
 
 public:
-	Lambertian(const Vec3& a) : albedo(a) {
+	Lambertian(const Vec3& a) : m_kd(a) {
 
 	}
 
-	bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered) const {
+	bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered, float& pdf) const {
 		Vec3 target = rec.p + rec.normal + RandomInUnitSphere();
 		scattered = Ray(rec.p, target - rec.p);
-		attenuation = albedo / M_PI;
+    scattered.direction().make_unit_vector();
+    float cos_theta = Vec3::dot(scattered.direction(), rec.normal);
+    pdf = Pdf(cos_theta);
+		attenuation = m_kd / M_PI;
 
 		return true;
 	}
@@ -20,9 +23,9 @@ public:
 
   float Pdf(float theta) const
   {
-    return cos(theta) / M_PI;
+    return theta / M_PI;
   }
 
-	Vec3 albedo;
+	Vec3 m_kd;
 
 };

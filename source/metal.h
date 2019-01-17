@@ -3,9 +3,9 @@
 
 class Metal : public Material {
 public:
-	Vec3 albedo;
+	Vec3 m_kd;
 	float fuzz;
-	Metal(const Vec3& a, float f) : albedo(a) {
+	Metal(const Vec3& a, float f) : m_kd(a) {
 		if(f < 1){
 			fuzz = f;
 		} else {
@@ -13,10 +13,10 @@ public:
 		}
 	}
 
-	virtual bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered) const {
+	virtual bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered, float& pdf) const {
 		Vec3 reflected = reflect(Vec3::unit_vector(r_in.direction()), rec.normal);
 		scattered = Ray(rec.p, reflected + fuzz * RandomInUnitSphere());
-		attenuation = albedo / M_PI;
+		attenuation = m_kd / M_PI;
 
 		return (Vec3::dot(scattered.direction(), rec.normal) > 0);
 	}

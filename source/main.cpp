@@ -8,6 +8,7 @@
 #include "microfacet.h"
 #include "quad.h"
 #include "sphere.h"
+#include "phong.h"
 
 #include <fstream>
 #include <iostream>
@@ -19,7 +20,8 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     Vec3 attenuation;
     float u, v;
     Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
-    if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered)) {
+    float pdf;
+    if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
       return emitted +
              attenuation * colourRecursive(scattered, world, depth + 1);
     } else {
@@ -46,11 +48,13 @@ Vec3 colour(const Ray &ray, const Hitable &world, int depth) {
       Vec3 attenuation;
       float u, v;
       Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
-      if (rec.mat_ptr->fr(r, rec, attenuation, scattered)) {
+      rec.normal.make_unit_vector();
+      float pdf = 0.0f;
+      if (rec.mat_ptr->fr(r, rec, attenuation, scattered, pdf)) {
         scattered.direction().make_unit_vector();
         rec.normal.make_unit_vector();
         float theta = Vec3::dot(scattered.direction(), rec.normal);
-        currentAttenuation *= attenuation / rec.mat_ptr->Pdf(theta) * cos(theta);
+        currentAttenuation *= attenuation / pdf * cos(theta);
         currentAttenuation += emitted;
         r = scattered;
       } else {
@@ -128,14 +132,19 @@ void SimpleScene(HitableList &list) {
       Vec3(-10.0f, -1.2f, 10.0f), Vec3(10.0f, -1.2f, 10.0f),
       Vec3(10.0f, -1.2f, -10.0f), Vec3(-10.0f, -1.2f, -10.0f),
       std::make_unique<Lambertian>(Vec3(0.4f, 0.4f, 0.4f))));
+  //list.list.push_back(std::make_unique<Sphere>(
+  //    Vec3(0, 0, 0), 1.0,
+		//std::make_unique<Lambertian>(Vec3(0.8, 0.1, 0.1))));
+
   list.list.push_back(std::make_unique<Sphere>(
-      Vec3(0, 0, -20), 1.0,
-		std::make_unique<Lambertian>(Vec3(0.8, 0.1, 0.1))));
+      Vec3(0, 0, 0), 1.0,
+		std::make_unique<Phong>(Vec3(0.7, 0.7, 0.7), Vec3(0.2, 0.2, 0.2))));
+
 //  list.list.push_back(std::make_unique<Sphere>(
 //      Vec3(0, 0, 0), 1.0,
 //      std::make_unique<Dielectric>(1.5f)));
-  list.list.push_back(std::make_unique<Sphere>(
-      Vec3(0, 0, 0), 1.0, std::make_unique<Metal>(Vec3(1.0, 1.0, 1.0), 0.0)));
+  //list.list.push_back(std::make_unique<Sphere>(
+  //    Vec3(0, 0, 0), 1.0, std::make_unique<Metal>(Vec3(1.0, 1.0, 1.0), 0.0)));
 
   //  list.list.push_back(std::make_unique<Sphere>(
   //   Vec3(0, 0, 0), 1.0, std::make_unique<Microfacet>(Vec3(0.8, 0.1, 0.1),
@@ -200,7 +209,7 @@ int main() {
   os.open("mis.ppm", std::ios::binary);
   int nx = 512;
   int ny = 512;
-  int ns = 64;
+  int ns = 32;
 
   os << "P3" << std::endl;
   os << nx << " " << ny << std::endl;

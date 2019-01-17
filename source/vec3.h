@@ -181,6 +181,10 @@ public:
 		return v / v.length();
 	}
 
+  inline float getLuminance() const {
+    return e[0] * 0.212671f + e[1] * 0.715160f + e[2] * 0.072169f;
+  }
+
 };
 
 inline Vec3 RandomInUnitDisk() {
