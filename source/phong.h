@@ -5,7 +5,7 @@ class Phong : public Material {
 
 public:
   Phong(const Vec3& a, const Vec3& ks) : m_kd(a), m_ks(ks) {
-    n = 300000;
+    n = 10000;
   }
 
   bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered, float& pdf) const {
@@ -22,7 +22,7 @@ public:
     perfectReflection.make_unit_vector();
 
     Vec3 scattered_dir;
-
+    pdf = 0.0f;
     if (epsilon < diffuse_lum)
     {
       // Diffuse component
@@ -39,16 +39,20 @@ public:
     if (epsilon <= diffuse_lum + specular_lum)
     {
       // Specular component
-      float sin_alpha = std::sqrt(1 - std::pow(u, 2.0f / (n + 1)));
+      float sin_alpha = std::sqrt(1 - std::pow(u, 2.0f / (n + 1.0f)));
       float cos_alpha = std::pow(u, 1 / (n+1));
       float phi = 2 * M_PI * v;
       float cos_phi = std::cos(phi);
       float sin_phi = std::sin(phi);
 
+
       scattered_dir = Vec3(sin_alpha * cos_phi, sin_alpha * sin_phi, cos_alpha);
       scattered_dir.make_unit_vector();
 
-      pdf = (n + 1) / (2 * M_PI) * powf(Vec3::dot(scattered_dir, perfectReflection), n);
+      float alpha = Vec3::dot(scattered_dir, perfectReflection);
+      if (alpha > 0) {
+        pdf = (n + 1.0f) / (2.0f * M_PI) * powf(alpha, n);
+      }
     }
     else
     {
@@ -61,7 +65,7 @@ public:
 
     alpha = fmax(alpha, 2 * M_PI);
     
-    attenuation = m_kd / M_PI + m_ks * ( n + 2) / (2* M_PI) * pow(cos(alpha), n);
+    attenuation =  m_ks * ( n + 2.0f ) / (2.0f * M_PI) * pow(cos(alpha), n);
 
     return true;
   }
