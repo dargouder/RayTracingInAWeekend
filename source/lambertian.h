@@ -1,5 +1,6 @@
 #pragma once
 #include "material.h"
+#include "onb.h"
 
 class Lambertian : public Material {
  public:
@@ -7,12 +8,16 @@ class Lambertian : public Material {
 
   bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation,
           Ray& scattered, float& pdf) const {
-    Vec3 target = rec.normal + RandomInUnitSphere();
-    scattered = Ray(rec.p, target);
-    scattered.direction().make_unit_vector();
+    ONB uvw;
+    uvw.build_from_w(rec.normal);
+    Vec3 direction = uvw.local(CosineSampleHemisphere());
+    direction.make_unit_vector();
+    //Vec3 target = rec.normal + CosineSampleHemisphere ();// RandomInUnitSphere();
+    scattered = Ray(rec.p, direction);
+    //scattered.direction().make_unit_vector();
     float cos_theta = Vec3::dot(scattered.direction(), rec.normal);
-    pdf = Pdf(cos_theta);
-    attenuation = m_kd / M_PI;
+    pdf = Vec3::dot(uvw.w(), scattered.direction()) / M_PI;
+    attenuation = m_kd;
 
     return true;
   }

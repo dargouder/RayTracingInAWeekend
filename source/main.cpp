@@ -54,7 +54,7 @@ Vec3 colour(const Ray &ray, const Hitable &world, int depth) {
         scattered.direction().make_unit_vector();
         rec.normal.make_unit_vector();
         float theta = Vec3::dot(scattered.direction(), rec.normal);
-        currentAttenuation *= attenuation / pdf * cos(theta);
+        currentAttenuation *= (attenuation / pdf) * cos(theta);
         currentAttenuation += emitted;
         r = scattered;
       } else {
@@ -132,17 +132,17 @@ void SimpleScene(HitableList &list) {
       Vec3(-10.0f, -1.2f, 10.0f), Vec3(10.0f, -1.2f, 10.0f),
       Vec3(10.0f, -1.2f, -10.0f), Vec3(-10.0f, -1.2f, -10.0f),
       std::make_unique<Lambertian>(Vec3(0.4f, 0.4f, 0.4f))));
-  //list.list.push_back(std::make_unique<Sphere>(
-  //    Vec3(0, 0, 0), 1.0,
-		//std::make_unique<Lambertian>(Vec3(0.8, 0.1, 0.1))));
+  list.list.push_back(std::make_unique<Sphere>(
+      Vec3(0, 0, 0), 1.0,
+		std::make_unique<Lambertian>(Vec3(0.8, 0.1, 0.1))));
 
   //list.list.push_back(std::make_unique<Sphere>(
   //    Vec3(0, 0, 0), 1.0,
 		//std::make_unique<Phong>(Vec3(0.8f, 0.1f, 0.1f), Vec3(0.0f, 0.0f, 0.0f))));
 
-    list.list.push_back(std::make_unique<Sphere>(
+/*    list.list.push_back(std::make_unique<Sphere>(
       Vec3(0, 0, 0), 1.0,
-      std::make_unique<Phong>(Vec3(0.2f, 0.2f, 0.2f), Vec3(0.8f, 0.8f, 0.8f))));
+      std::make_unique<Phong>(Vec3(0.2f, 0.2f, 0.2f), Vec3(0.8f, 0.8f, 0.8f))))*/;
 
 //  list.list.push_back(std::make_unique<Sphere>(
 //      Vec3(0, 0, 0), 1.0,
