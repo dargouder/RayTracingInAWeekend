@@ -173,6 +173,7 @@ static Vec3 CosineSampleHemisphere() {
   float y = sin(phi) * 2 * sqrt(v);
   return Vec3(x, y, z);
 }
+
 static Vec3 RandomInUnitSphere() {
   Vec3 p;
   do {

@@ -32,5 +32,5 @@ void ONB::build_from_w(const Vec3& n) {
     a = Vec3(1, 0, 0);
   }
   axis[1] = Vec3::unit_vector(Vec3::cross(w(), a));
-  axis[0] = Vec3::cross(w(), v());
+  axis[0] = Vec3::unit_vector(Vec3::cross(w(), v()));
 }

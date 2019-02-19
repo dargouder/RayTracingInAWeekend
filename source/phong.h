@@ -70,7 +70,9 @@ class Phong : public Material {
 
   Vec3 Le(float u, float v, const Vec3& p) const { return Vec3(0, 0, 0); }
 
-  float Pdf(float theta) const { return cos(theta) / M_PI; }
+  float ScatteredPdf(const Ray &r_in, const HitRecord &rec, const Ray &scattered) const {
+      return 0;//cos(theta) / M_PI;
+  }
 
   Vec3 m_kd, m_ks;
   float n;

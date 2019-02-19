@@ -23,8 +23,8 @@ public:
 
   virtual Vec3 Le(float u, float v, const Vec3& p) const { return Vec3(0, 0, 0); }
 
-  float Pdf(float theta) const
+  float ScatteredPdf(const Ray &r_in, const HitRecord &rec, const Ray &scattered) const
   {
-    return cos(theta) * fuzz / M_PI;
+    return 0;//cos(theta) * fuzz / M_PI;
   }
 };

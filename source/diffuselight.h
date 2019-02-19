@@ -10,7 +10,7 @@ public:
   virtual Vec3 Le(float u, float v, const Vec3& p) const { return emit; }
   Vec3 emit;
 
-  float Pdf(float theta) const
+  float ScatteredPdf(const Ray &r_in, const HitRecord &rec, const Ray &scattered) const
   {
     return 1.0f;
   }

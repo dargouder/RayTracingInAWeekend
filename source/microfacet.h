@@ -163,7 +163,7 @@ class Microfacet : public Material {
     return result;
   }
 
-  float Pdf(float theta) const { return 0.0f; }
+  float ScatteringPdf(float theta) const { return 0.0f; }
 
   Vec3 m_kd, m_ks;
   float m_alpha_b, m_ior;

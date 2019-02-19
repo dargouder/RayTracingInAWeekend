@@ -23,7 +23,7 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     float pdf;
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
       return emitted +
-             attenuation * colourRecursive(scattered, world, depth + 1);
+              (attenuation * rec.mat_ptr->ScatteredPdf(ray, rec, scattered) * colourRecursive(scattered, world, depth + 1)) / (pdf);
     } else {
       return emitted;
     }
