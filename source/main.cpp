@@ -222,12 +222,69 @@ void simpleLight(HitableList &list) {
                                                  std::make_unique<DiffuseLight>(Vec3(4.0f, 4.0f, 4.0f))));
 }
 
+void CornellBox(HitableList &list)
+{
+    // floor
+//    list.list.push_back(std::make_unique<Quad>(
+//            Vec3(552.8f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.0f),
+//            Vec3(0.0f, 0.0f, 559.2f), Vec3(549.6f, 0.0f, 559.2f),
+//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
+
+    // ceiling
+//    list.list.push_back(std::make_unique<Quad>(
+//            Vec3(556.0f, 548.8f, 0.0f), Vec3(556.0f, 548.8f, 559.2f),
+//            Vec3(0.0f, 548.8f, 559.2f), Vec3(0.6f, 548.8f, 0.0f),
+//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
+
+    // back wall
+//    list.list.push_back(std::make_unique<Quad>(
+//            Vec3(549.6f, 0.0f, 559.2f), Vec3(0.0f, 0.0f, 559.2f),
+//            Vec3(0.0f, 548.8f, 559.2f), Vec3(556.6f, 548.8f, 559.2f),
+//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
+
+    // right wall
+//    list.list.push_back(std::make_unique<Quad>(
+//            Vec3(0.0f, 0.0f, 559.2f), Vec3(0.0f, 0.0f, 0.0f),
+//            Vec3(0.0f, 548.8f, 0.0f), Vec3(0.0f, 548.8f, 559.2f),
+//            std::make_unique<Lambertian>(Vec3(0.0f, 0.9f, 0.0f))));
+
+    // left wall
+    list.list.push_back(std::make_unique<Quad>(
+            Vec3(552.8f, 0.0f, 0.0f), Vec3(549.6f, 0.0f, 559.2f),
+            Vec3(556.0f, 548.8f, 559.2f), Vec3(556.6f, 548.8f, 0.0f),
+            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
+
+// short block
+//    list.list.push_back(std::make_unique<Quad>(
+//            Vec3(130.0, 165.0,  65.0), Vec3(82.0, 165.0, 225.0),
+//            Vec3(240.0, 165.0, 272.0), Vec3(290.0, 165.0, 114.0),
+//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
+//    list.list.push_back(std::make_unique<Quad>(
+//            Vec3(290.0,   0.0, 114.0), Vec3(290.0, 165.0, 114.0),
+//            Vec3(240.0, 165.0, 272.0), Vec3(240.0,   0.0, 272.0),
+//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
+//    list.list.push_back(std::make_unique<Quad>(
+//            Vec3(130.0,   0.0,  65.0), Vec3(130.0, 165.0,  65.0),
+//            Vec3(290.0, 165.0, 114.0), Vec3(290.0,   0.0, 114.0),
+//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
+//    list.list.push_back(std::make_unique<Quad>(
+//            Vec3(82.0,   0.0, 225.0), Vec3(82.0, 165.0, 225.0),
+//            Vec3(130.0, 165.0,  65.0), Vec3(130.0,   0.0,  65.0),
+//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
+//    list.list.push_back(std::make_unique<Quad>(
+//            Vec3(240.0,   0.0, 272.0), Vec3(240.0, 165.0, 272.0),
+//            Vec3(82.0, 165.0, 225.0), Vec3(82.0,   0.0, 225.0),
+//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
+//long block
+}
+
+
 int main() {
     std::ofstream os;
     os.open("mis.ppm", std::ios::binary);
     int nx = 512;
     int ny = 512;
-    int ns = 32;
+    int ns = 16;
 
     os << "P3" << std::endl;
     os << nx << " " << ny << std::endl;
@@ -236,11 +293,11 @@ int main() {
     HitableList world;
 
     // MISScene(world);
-    SimpleScene(world);
-    //simpleLight(world);
+    //SimpleScene(world);
+    CornellBox(world);
     // RandomScene(world);
     // Vec3 lookfrom(0.0f, 2.0f, 15.0f), lookat(0.0f, -2.0f, 2.5f);
-    Vec3 lookfrom(0.0f, 0.0f, -10.0f), lookat(0.0f, 0.0f, 0.0f);
+    Vec3 lookfrom(278.0f, 273.0f, -800.0f), lookat(278.0f, 273.0f, -799.0f);
     // Vec3 lookfrom(13.0f, 2.0f, 3.0f), lookat(0.0f, 0.0f, 0.0f);
     float dist_to_focus = (lookfrom - lookat).length();
     float aperture = 0.0f;
