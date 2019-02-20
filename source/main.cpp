@@ -238,21 +238,6 @@ void MISScene(HitableList &list) {
       std::make_unique<Metal>(Vec3(1.0, 1.0, 1.0), 0.125f)));
 }
 
-void simpleLight(HitableList &list) {
-  list.list.push_back(std::make_unique<Sphere>(
-      Vec3(0.0f, -1000.0f, 0.0f), 1000.0f,
-      std::make_unique<Lambertian>(Vec3(0.8f, 0.1f, 0.1f))));
-  list.list.push_back(std::make_unique<Sphere>(
-      Vec3(0.0f, 2.0f, 0.0f), 2.0f,
-      std::make_unique<Lambertian>(Vec3(0.2f, 0.5f, 0.5f))));
-  list.list.push_back(std::make_unique<Sphere>(
-      Vec3(0.0f, 7.0f, 0.0f), 2.0f,
-      std::make_unique<DiffuseLight>(Vec3(4.0f, 4.0f, 4.0f))));
-  list.list.push_back(std::make_unique<XYRect>(
-      3.0f, 5.0f, 1.0f, 3.0f, -2.0f,
-      std::make_unique<DiffuseLight>(Vec3(4.0f, 4.0f, 4.0f))));
-}
-
 void CornellBox(HitableList &list) {
   // floor
   list.list.push_back(std::make_unique<Quad>(
@@ -334,72 +319,14 @@ void CornellBox(HitableList &list) {
       std::make_unique<DiffuseLight>(Vec3(1.9f, 1.9f, 1.9f))));
 }
 
-void CornellBox(HitableList &list)
-{
-    // floor
-//    list.list.push_back(std::make_unique<Quad>(
-//            Vec3(552.8f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.0f),
-//            Vec3(0.0f, 0.0f, 559.2f), Vec3(549.6f, 0.0f, 559.2f),
-//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
-
-    // ceiling
-//    list.list.push_back(std::make_unique<Quad>(
-//            Vec3(556.0f, 548.8f, 0.0f), Vec3(556.0f, 548.8f, 559.2f),
-//            Vec3(0.0f, 548.8f, 559.2f), Vec3(0.6f, 548.8f, 0.0f),
-//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
-
-    // back wall
-//    list.list.push_back(std::make_unique<Quad>(
-//            Vec3(549.6f, 0.0f, 559.2f), Vec3(0.0f, 0.0f, 559.2f),
-//            Vec3(0.0f, 548.8f, 559.2f), Vec3(556.6f, 548.8f, 559.2f),
-//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
-
-    // right wall
-//    list.list.push_back(std::make_unique<Quad>(
-//            Vec3(0.0f, 0.0f, 559.2f), Vec3(0.0f, 0.0f, 0.0f),
-//            Vec3(0.0f, 548.8f, 0.0f), Vec3(0.0f, 548.8f, 559.2f),
-//            std::make_unique<Lambertian>(Vec3(0.0f, 0.9f, 0.0f))));
-
-    // left wall
-    list.list.push_back(std::make_unique<Quad>(
-            Vec3(552.8f, 0.0f, 0.0f), Vec3(549.6f, 0.0f, 559.2f),
-            Vec3(556.0f, 548.8f, 559.2f), Vec3(556.6f, 548.8f, 0.0f),
-            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
-
-// short block
-//    list.list.push_back(std::make_unique<Quad>(
-//            Vec3(130.0, 165.0,  65.0), Vec3(82.0, 165.0, 225.0),
-//            Vec3(240.0, 165.0, 272.0), Vec3(290.0, 165.0, 114.0),
-//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
-//    list.list.push_back(std::make_unique<Quad>(
-//            Vec3(290.0,   0.0, 114.0), Vec3(290.0, 165.0, 114.0),
-//            Vec3(240.0, 165.0, 272.0), Vec3(240.0,   0.0, 272.0),
-//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
-//    list.list.push_back(std::make_unique<Quad>(
-//            Vec3(130.0,   0.0,  65.0), Vec3(130.0, 165.0,  65.0),
-//            Vec3(290.0, 165.0, 114.0), Vec3(290.0,   0.0, 114.0),
-//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
-//    list.list.push_back(std::make_unique<Quad>(
-//            Vec3(82.0,   0.0, 225.0), Vec3(82.0, 165.0, 225.0),
-//            Vec3(130.0, 165.0,  65.0), Vec3(130.0,   0.0,  65.0),
-//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
-//    list.list.push_back(std::make_unique<Quad>(
-//            Vec3(240.0,   0.0, 272.0), Vec3(240.0, 165.0, 272.0),
-//            Vec3(82.0, 165.0, 225.0), Vec3(82.0,   0.0, 225.0),
-//            std::make_unique<Lambertian>(Vec3(0.9f, 0.9f, 0.9f))));
-//long block
-}
-
-
 int main() {
-
   std::ofstream os;
   os.open("mis.ppm", std::ios::binary);
   const int nx = 512;
   const int ny = 512;
-  const int ns = 1;
+  const int ns = 32;
 
-    int *image = new int[nx * ny * 3];
+  int *image = new int[nx * ny * 3];
 
   os << "P3" << std::endl;
   os << nx << " " << ny << std::endl;
@@ -419,7 +346,7 @@ int main() {
   Camera cam(lookfrom, lookat, Vec3(0, 1, 0), 35, float(nx / ny), aperture,
              dist_to_focus);
 
-//#pragma omp parallel for
+#pragma omp parallel for
   for (int j = ny - 1; j >= 0; j--) {
     for (int i = 0; i < nx; i++) {
       Vec3 col(0.0, 0.0, 0.0);
@@ -428,7 +355,6 @@ int main() {
         double v = float(j + RAND()) / float(ny);
 
         Ray r = cam.GetRay(u, v);
-
         col += colourRecursive(r, world, 0);
       }
 
@@ -438,23 +364,24 @@ int main() {
       col[2] = col[2] > 1 ? 1 : col[2];
       col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
 
-      //col = Vec3(float(i) / float(ny), float(j) / float(nx), 1.0f);
-        int y_pixel = ny - j - 1;
-      int index = (i + y_pixel * nx)*3;
-      image[index] = int(255.99 * col[0]);  // > 256 ? 256 : int(255.99 * col[0]);
-      image[index+1] = int(255.99 * col[1]);  // > 256 ? 256 : int(255.99 * col[1]);
-      image[index+2] = int(255.99 * col[2]);  // > 256 ? 256 : int(255.99 * col[2]);
-      //os << image[index] << " " << image[index+1] << " " << image[index+2] << "\n";
+      int y_pixel = ny - j - 1;
+      int index = (i + y_pixel * nx) * 3;
+      image[index] =
+          int(255.99 * col[0]);  // > 256 ? 256 : int(255.99 * col[0]);
+      image[index + 1] =
+          int(255.99 * col[1]);  // > 256 ? 256 : int(255.99 * col[1]);
+      image[index + 2] =
+          int(255.99 * col[2]);  // > 256 ? 256 : int(255.99 * col[2]);
     }
   }
-//
-    for(int i = 0; i < nx*ny*3; i+=3)
-    {
-        os << image[i] << image[i+1] << image[i+2] << "\n";
 
-    }
 
-    delete image;
+  for (int i = 0; i < nx * ny * 3; i += 3) {
+    os << image[i] << " " << image[i + 1] << " " << image[i + 2] << "\n";
+  }
+
   os.close();
+
+  delete image;
   return 0;
 }
