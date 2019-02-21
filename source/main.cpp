@@ -23,13 +23,18 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
     float pdf;
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
-      return emitted +
-             attenuation * colourRecursive(scattered, world, depth + 1);
+//      return emitted +
+//             attenuation * colourRecursive(scattered, world, depth + 1);
+
+      float scatteredPdf = rec.mat_ptr->ScatteredPdf(ray, rec, scattered);
+            return emitted +
+                   (attenuation * scatteredPdf  *
+                    colourRecursive(scattered, world, depth + 1)) / (pdf);
     } else {
       return emitted;
     }
   } else {
-    // return Vec3(0,0,0);
+     return Vec3(0,0,0);
     Vec3 unit_direction = Vec3::unit_vector(ray.direction());
     float t = 0.5f * (unit_direction.y() + 1.0f);
     Vec3 col = (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
@@ -324,7 +329,7 @@ int main() {
   os.open("mis.ppm", std::ios::binary);
   const int nx = 512;
   const int ny = 512;
-  const int ns = 32;
+  const int ns = 64;
 
   int *image = new int[nx * ny * 3];
 
@@ -346,7 +351,7 @@ int main() {
   Camera cam(lookfrom, lookat, Vec3(0, 1, 0), 35, float(nx / ny), aperture,
              dist_to_focus);
 
-#pragma omp parallel for
+//#pragma omp parallel for
   for (int j = ny - 1; j >= 0; j--) {
     for (int i = 0; i < nx; i++) {
       Vec3 col(0.0, 0.0, 0.0);
@@ -382,6 +387,6 @@ int main() {
 
   os.close();
 
-  delete image;
+  delete[] image;
   return 0;
 }

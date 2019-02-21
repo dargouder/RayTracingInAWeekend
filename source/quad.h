@@ -21,7 +21,7 @@ public:
 
 
 	bool hit(const Ray& r, float tmin, float tmax, HitRecord& rec) const {
-		const float epsilon = 10e-6;
+		const float epsilon = 1e-6;
 		float u,v;
 		// Reject rays using the barycentric coordinates of the intersection point with respect to T
 		Vec3 e01 = m_v10 - m_v00;
@@ -141,8 +141,8 @@ public:
 		rec.mat_ptr = material.get();
 		rec.normal = Vec3::cross(m_v10 - m_v00, m_v01 - m_v00);
 		rec.normal.make_unit_vector();
-
-		rec.p = poi + 10e-5 * rec.normal;
+		//rec.p = poi;
+		rec.p = poi + Vec3(1, 1, 1)*epsilon + rec.normal;
 		return true;
 	}
 
