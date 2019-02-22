@@ -27,5 +27,10 @@ public:
 		return hit_anything;
 	}
 
+  Vec3 generateSampleOnSurface() const
+  {
+    return Vec3(0.0f, 0.0f, 0.0f);
+  }
+
 	std::vector<std::unique_ptr<Hitable>> list;
 };

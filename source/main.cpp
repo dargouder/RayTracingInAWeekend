@@ -25,16 +25,59 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
       return emitted +
              attenuation * colourRecursive(scattered, world, depth + 1);
+
+      float scatteredPdf = rec.mat_ptr->ScatteredPdf(ray, rec, scattered);
+            return emitted +
+                   (attenuation * scatteredPdf  *
+                    colourRecursive(scattered, world, depth + 1)) / (pdf);
     } else {
       return emitted;
     }
   } else {
-    // return Vec3(0,0,0);
+     return Vec3(0,0,0);
     Vec3 unit_direction = Vec3::unit_vector(ray.direction());
     float t = 0.5f * (unit_direction.y() + 1.0f);
     Vec3 col = (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
     return col;
-    ;
+  }
+}
+
+Vec3 directLighting(const Ray &ray, const Hitable &world, const Hitable *light, int depth) {
+  HitRecord rec;
+  if (world.hit(ray, 0.001, FLT_MAX, rec)) {
+    Ray scattered;
+    Vec3 attenuation;
+    float u = 0.0f, v = 0.0f;
+    Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
+    float pdf;
+    if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
+      Vec3 shadowAccumulation(0.0f, 0.0f, 0.0f);
+
+      for (int i = 0; i < 4; ++i)
+      {
+        Vec3 lightSample = light->generateSampleOnSurface();
+        Ray shadowRay(rec.p, Vec3::unit_vector(lightSample - rec.p));
+        HitRecord shadowRec;
+        if (world.hit(shadowRay, 0.001, FLT_MAX, shadowRec))
+        {
+          if (shadowRec.mat_ptr == ((Quad*)light)->material.get())
+          {
+            shadowAccumulation += attenuation;
+          }
+          else
+          {
+            shadowAccumulation += Vec3(0.0, 0.0, 0.0f);
+          }
+        }
+      }
+      return shadowAccumulation/4.0f;
+    }
+    else {
+      return emitted;
+    }
+  }
+  else {
+    return Vec3(0, 0, 0);
   }
 }
 
@@ -150,38 +193,9 @@ void RandomScene(HitableList &list) {
 
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(0, 1, 0), 1.0, std::make_unique<Dielectric>(1.5)));
-  ;
+  
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(4, 1, 0), 1.0, std::make_unique<Metal>(Vec3(0.7, 0.6, 0.5), 0.0)));
-}
-
-void SimpleScene(HitableList &list) {
-  list.list.push_back(std::make_unique<Quad>(
-      Vec3(-10.0f, -1.2f, 10.0f), Vec3(10.0f, -1.2f, 10.0f),
-      Vec3(10.0f, -1.2f, -10.0f), Vec3(-10.0f, -1.2f, -10.0f),
-      std::make_unique<Lambertian>(Vec3(0.4f, 0.4f, 0.4f))));
-  list.list.push_back(std::make_unique<Sphere>(
-      Vec3(0, 0, 0), 1.0, std::make_unique<Lambertian>(Vec3(0.8, 0.1, 0.1))));
-
-  // list.list.push_back(std::make_unique<Sphere>(
-  //    Vec3(0, 0, 0), 1.0,
-  // std::make_unique<Phong>(Vec3(0.8f, 0.1f, 0.1f), Vec3(0.0f, 0.0f, 0.0f))));
-
-  /*    list.list.push_back(std::make_unique<Sphere>(
-        Vec3(0, 0, 0), 1.0,
-        std::make_unique<Phong>(Vec3(0.2f, 0.2f, 0.2f), Vec3(0.8f, 0.8f,
-     0.8f))))*/
-  ;
-
-  //  list.list.push_back(std::make_unique<Sphere>(
-  //      Vec3(0, 0, 0), 1.0,
-  //      std::make_unique<Dielectric>(1.5f)));
-  // list.list.push_back(std::make_unique<Sphere>(
-  //    Vec3(0, 0, 0), 1.0, std::make_unique<Metal>(Vec3(1.0, 1.0, 1.0), 0.0)));
-
-  //  list.list.push_back(std::make_unique<Sphere>(
-  //   Vec3(0, 0, 0), 1.0, std::make_unique<Microfacet>(Vec3(0.8, 0.1, 0.1),
-  //   Vec3(1.0, 1.0f, 1.0f), 0.52f)));
 }
 
 void MISScene(HitableList &list) {
@@ -238,7 +252,7 @@ void MISScene(HitableList &list) {
       std::make_unique<Metal>(Vec3(1.0, 1.0, 1.0), 0.125f)));
 }
 
-void CornellBox(HitableList &list) {
+void CornellBox(HitableList &list, Hitable *light) {
   // floor
   list.list.push_back(std::make_unique<Quad>(
       Vec3(552.8f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.0f),
@@ -314,17 +328,20 @@ void CornellBox(HitableList &list) {
 
   // light
   list.list.push_back(std::make_unique<Quad>(
-      Vec3(343.0f, 548.8f, 227.0f), Vec3(343.0f, 548.0f, 332.0f),
+      Vec3(343.0f, 548.8f, 227.0f), Vec3(343.0f, 548.8f, 332.0f),
       Vec3(213.0f, 548.8f, 332.2f), Vec3(213.0f, 548.8f, 227.0f),
-      std::make_unique<DiffuseLight>(Vec3(1.9f, 1.9f, 1.9f))));
+      std::make_unique<DiffuseLight>(Vec3(4.0f, 4.0f, 4.0f))));
+
+  //light = list.list[list.list.size() - 1].get();
+  
 }
 
 int main() {
   std::ofstream os;
-  os.open("mis.ppm", std::ios::binary);
+  os.open("bsdf_sampling.ppm", std::ios::binary);
   const int nx = 512;
   const int ny = 512;
-  const int ns = 32;
+  const int ns = 16;
 
   int *image = new int[nx * ny * 3];
 
@@ -333,10 +350,13 @@ int main() {
   os << "255" << std::endl;
 
   HitableList world;
+  Hitable *light = nullptr;
 
   // MISScene(world);
   // SimpleScene(world);
-  CornellBox(world);
+  CornellBox(world, light);
+
+  light = world.list[world.list.size() - 1].get();
   // RandomScene(world);
   // Vec3 lookfrom(0.0f, 2.0f, 15.0f), lookat(0.0f, -2.0f, 2.5f);
   Vec3 lookfrom(278.0f, 273.0f, -800.0f), lookat(278.0f, 273.0f, -799.0f);
@@ -346,7 +366,7 @@ int main() {
   Camera cam(lookfrom, lookat, Vec3(0, 1, 0), 35, float(nx / ny), aperture,
              dist_to_focus);
 
-#pragma omp parallel for
+//#pragma omp parallel for
   for (int j = ny - 1; j >= 0; j--) {
     for (int i = 0; i < nx; i++) {
       Vec3 col(0.0, 0.0, 0.0);
@@ -355,7 +375,8 @@ int main() {
         double v = float(j + RAND()) / float(ny);
 
         Ray r = cam.GetRay(u, v);
-        col += colourRecursive(r, world, 0);
+        //col += directLighting(r, world, light, 0);
+		col += colourRecursive(r, world, 0);
       }
 
       col /= float(ns);
@@ -382,6 +403,6 @@ int main() {
 
   os.close();
 
-  delete image;
+  delete[] image;
   return 0;
 }

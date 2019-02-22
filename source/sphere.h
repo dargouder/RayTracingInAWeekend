@@ -42,5 +42,10 @@ public:
 		return false;
 	}
 
+  Vec3 generateSampleOnSurface() const
+  {
+    return Vec3(0.0f, 0.0f, 0.0f);
+  }
+
 
 };
