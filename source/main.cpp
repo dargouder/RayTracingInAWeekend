@@ -23,9 +23,6 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
     float pdf;
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
-      return emitted +
-             attenuation * colourRecursive(scattered, world, depth + 1);
-
       float scatteredPdf = rec.mat_ptr->ScatteredPdf(ray, rec, scattered);
             return emitted +
                    (attenuation * scatteredPdf  *
@@ -341,7 +338,11 @@ int main() {
   os.open("bsdf_sampling.ppm", std::ios::binary);
   const int nx = 512;
   const int ny = 512;
+<<<<<<< HEAD
   const int ns = 16;
+=======
+  const int ns = 64;
+>>>>>>> 9d554e0a4992c710ffbf08b8779f1797edbc3aa9
 
   int *image = new int[nx * ny * 3];
 
