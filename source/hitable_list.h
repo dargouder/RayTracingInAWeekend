@@ -32,5 +32,9 @@ public:
     return Vec3(0.0f, 0.0f, 0.0f);
   }
 
+  float Pdf() const
+  {
+    return 0.0f;
+  }
 	std::vector<std::unique_ptr<Hitable>> list;
 };

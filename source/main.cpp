@@ -23,6 +23,9 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
     float pdf;
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
+//      return emitted +
+//             attenuation * colourRecursive(scattered, world, depth + 1);
+
       float scatteredPdf = rec.mat_ptr->ScatteredPdf(ray, rec, scattered);
             return emitted +
                    (attenuation * scatteredPdf  *
@@ -39,6 +42,13 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
   }
 }
 
+inline float PowerHeuristic(int nf, float fPdf, int ng, float gPdf)
+{
+  float f = nf * fPdf;
+  float g = ng * gPdf;
+  return (f*f) / (f*f + g*g);
+}
+
 Vec3 directLighting(const Ray &ray, const Hitable &world, const Hitable *light, int depth) {
   HitRecord rec;
   if (world.hit(ray, 0.001, FLT_MAX, rec)) {
@@ -47,10 +57,11 @@ Vec3 directLighting(const Ray &ray, const Hitable &world, const Hitable *light, 
     float u = 0.0f, v = 0.0f;
     Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
     float pdf;
+    int shadowSamples = 4;
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
       Vec3 shadowAccumulation(0.0f, 0.0f, 0.0f);
 
-      for (int i = 0; i < 4; ++i)
+      for (int i = 0; i < shadowSamples; ++i)
       {
         Vec3 lightSample = light->generateSampleOnSurface();
         Ray shadowRay(rec.p, Vec3::unit_vector(lightSample - rec.p));
@@ -59,7 +70,9 @@ Vec3 directLighting(const Ray &ray, const Hitable &world, const Hitable *light, 
         {
           if (shadowRec.mat_ptr == ((Quad*)light)->material.get())
           {
-            shadowAccumulation += attenuation;
+            float lightPdf = light->Pdf();
+            Vec3 Le = shadowRec.mat_ptr->Le(u, v, rec.p);
+            shadowAccumulation += Le * attenuation / lightPdf;
           }
           else
           {
@@ -67,7 +80,7 @@ Vec3 directLighting(const Ray &ray, const Hitable &world, const Hitable *light, 
           }
         }
       }
-      return shadowAccumulation/4.0f;
+      return shadowAccumulation/float(shadowSamples);
     }
     else {
       return emitted;
@@ -335,14 +348,10 @@ void CornellBox(HitableList &list, Hitable *light) {
 
 int main() {
   std::ofstream os;
-  os.open("bsdf_sampling.ppm", std::ios::binary);
+  os.open("mis.ppm", std::ios::binary);
   const int nx = 512;
   const int ny = 512;
-<<<<<<< HEAD
   const int ns = 16;
-=======
-  const int ns = 64;
->>>>>>> 9d554e0a4992c710ffbf08b8779f1797edbc3aa9
 
   int *image = new int[nx * ny * 3];
 
@@ -376,8 +385,7 @@ int main() {
         double v = float(j + RAND()) / float(ny);
 
         Ray r = cam.GetRay(u, v);
-        //col += directLighting(r, world, light, 0);
-		col += colourRecursive(r, world, 0);
+        col += directLighting(r, world, light, 0);//colourRecursive(r, world, 0);
       }
 
       col /= float(ns);

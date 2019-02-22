@@ -47,5 +47,9 @@ public:
     return Vec3(0.0f, 0.0f, 0.0f);
   }
 
+  float Pdf() const
+  {
+    return 4 * M_PI * radius * radius;
+  }
 
 };

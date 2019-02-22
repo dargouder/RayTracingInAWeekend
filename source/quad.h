@@ -162,5 +162,17 @@ public:
     return poi;
   }
 
+  float Pdf() const
+  {
+    Vec3 E01 = m_v10 - m_v00;
+    Vec3 E03 = m_v01 - m_v00;
+
+    float length_01 = E01.length();
+    float length_03 = E03.length();
+
+    return 1.0f / (length_01 * length_03);
+
+  }
+
 
 };
