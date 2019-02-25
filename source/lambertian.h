@@ -22,7 +22,7 @@ public:
             Ray &scattered, float &pdf) const override {
         ONB uvw;
         uvw.build_from_w(rec.normal);
-        Vec3 direction = uvw.local(CosineSampleHemisphere());
+        Vec3 direction = uvw.local(CosineSampleHemisphere2());
         direction.make_unit_vector();
         scattered = Ray(rec.p, direction );
 

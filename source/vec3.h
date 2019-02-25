@@ -174,6 +174,21 @@ static Vec3 CosineSampleHemisphere() {
   return Vec3(x, y, z);
 }
 
+static Vec3 CosineSampleHemisphere2()
+{
+  float u = RAND();
+  float v = RAND();
+
+  const float r = sqrt(u);
+  const float theta = 2 * M_PI * v;
+
+  const float x = r * cos(theta);
+  const float y = r * sin(theta);
+
+  return Vec3(x, y, sqrt(std::max(0.0f, 1 - u)));
+
+}
+
 static Vec3 RandomInUnitSphere() {
   Vec3 p;
   do {

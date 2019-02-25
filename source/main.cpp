@@ -351,7 +351,7 @@ int main() {
   os.open("mis.ppm", std::ios::binary);
   const int nx = 512;
   const int ny = 512;
-  const int ns = 16;
+  const int ns = 64;
 
   int *image = new int[nx * ny * 3];
 
@@ -385,7 +385,8 @@ int main() {
         double v = float(j + RAND()) / float(ny);
 
         Ray r = cam.GetRay(u, v);
-        col += directLighting(r, world, light, 0);//colourRecursive(r, world, 0);
+       // col += directLighting(r, world, light, 0);
+        col += colourRecursive(r, world, 0);
       }
 
       col /= float(ns);
