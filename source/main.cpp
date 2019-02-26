@@ -72,7 +72,10 @@ Vec3 directLighting(const Ray &ray, const Hitable &world, const Hitable *light, 
           {
             float lightPdf = light->Pdf();
             Vec3 Le = shadowRec.mat_ptr->Le(u, v, rec.p);
-            shadowAccumulation += Le * attenuation / lightPdf;
+            float distanceSquared = (rec.p - shadowRec.p).squared_length();
+
+            float G = 1.0f / distanceSquared;
+            shadowAccumulation += (Le * attenuation * pdf * G)  / lightPdf;
           }
           else
           {
@@ -369,14 +372,14 @@ int main() {
   light = world.list[world.list.size() - 1].get();
   // RandomScene(world);
   // Vec3 lookfrom(0.0f, 2.0f, 15.0f), lookat(0.0f, -2.0f, 2.5f);
-  Vec3 lookfrom(278.0f, 273.0f, -800.0f), lookat(278.0f, 273.0f, -799.0f);
+  Vec3 lookfrom(278.0f, 292.0f, -800.0f), lookat(278.0f, 292.0f, -799.0f);
   // Vec3 lookfrom(13.0f, 2.0f, 3.0f), lookat(0.0f, 0.0f, 0.0f);
   float dist_to_focus = (lookfrom - lookat).length();
   float aperture = 0.0f;
   Camera cam(lookfrom, lookat, Vec3(0, 1, 0), 35, float(nx / ny), aperture,
              dist_to_focus);
 
-//#pragma omp parallel for
+#pragma omp parallel for
   for (int j = ny - 1; j >= 0; j--) {
     for (int i = 0; i < nx; i++) {
       Vec3 col(0.0, 0.0, 0.0);
@@ -385,8 +388,8 @@ int main() {
         double v = float(j + RAND()) / float(ny);
 
         Ray r = cam.GetRay(u, v);
-       // col += directLighting(r, world, light, 0);
-        col += colourRecursive(r, world, 0);
+        col += directLighting(r, world, light, 0);
+        //col += colourRecursive(r, world, 0);
       }
 
       col /= float(ns);
