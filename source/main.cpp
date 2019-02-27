@@ -23,18 +23,18 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     Vec3 emitted = rec.mat_ptr->Le(u, v, rec.p);
     float pdf;
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
-//      return emitted +
-//             attenuation * colourRecursive(scattered, world, depth + 1);
+      //      return emitted +
+      //             attenuation * colourRecursive(scattered, world, depth + 1);
 
       float scatteredPdf = rec.mat_ptr->ScatteredPdf(ray, rec, scattered);
-            return emitted +
-                   (attenuation * scatteredPdf  *
-                    colourRecursive(scattered, world, depth + 1)) / (pdf);
+      return emitted + (attenuation * scatteredPdf *
+                        colourRecursive(scattered, world, depth + 1)) /
+                           (pdf);
     } else {
       return emitted;
     }
   } else {
-     return Vec3(0,0,0);
+    return Vec3(0, 0, 0);
     Vec3 unit_direction = Vec3::unit_vector(ray.direction());
     float t = 0.5f * (unit_direction.y() + 1.0f);
     Vec3 col = (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
@@ -42,14 +42,47 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
   }
 }
 
-inline float PowerHeuristic(int nf, float fPdf, int ng, float gPdf)
-{
+inline float PowerHeuristic(int nf, float fPdf, int ng, float gPdf) {
   float f = nf * fPdf;
   float g = ng * gPdf;
-  return (f*f) / (f*f + g*g);
+  return (f * f) / (f * f + g * g);
 }
 
-Vec3 directLighting(const Ray &ray, const Hitable &world, const Hitable *light, int depth) {
+Vec3 directLighting(int shadowSamples, const Hitable &world,
+                    const Hitable *light, Vec3 attenuation, float pdf,
+                    HitRecord rec) {
+  Vec3 shadowAccumulation(0.0f, 0.0f, 0.0f);
+  for (int i = 0; i < shadowSamples; ++i) {
+    Vec3 lightSample = light->generateSampleOnSurface();
+    Ray shadowRay(rec.p, Vec3::unit_vector(lightSample - rec.p));
+    HitRecord shadowRec;
+    if (world.hit(shadowRay, 0.001, FLT_MAX, shadowRec)) {
+      if (shadowRec.mat_ptr == ((Quad *)light)->material.get()) {
+        float lightPdf = light->Pdf();
+        Vec3 Le = shadowRec.mat_ptr->Le(0.0f, 0.0f, rec.p);
+        float distanceSquared = (-shadowRec.p).squared_length();
+        float cos_theta_x =
+            std::max(Vec3::dot(rec.normal, shadowRay.direction()), 0.0f);
+        float cos_theta_y =
+            std::max(Vec3::dot(shadowRec.normal, -shadowRay.direction()), 0.0f);
+        float G = (cos_theta_x * cos_theta_y) / distanceSquared;
+        shadowAccumulation += (Le * attenuation * pdf * G) / lightPdf;
+      } else {
+        shadowAccumulation += Vec3(0.0, 0.0, 0.0f);
+      }
+    }
+  }
+
+  return shadowAccumulation / float(shadowSamples);
+}
+
+Vec3 indirectLighting(const Ray &ray, const Hitable &world, const Hitable *light, int depth)
+{
+
+}
+
+Vec3 render(const Ray &ray, const Hitable &world, const Hitable *light,
+                    int depth) {
   HitRecord rec;
   if (world.hit(ray, 0.001, FLT_MAX, rec)) {
     Ray scattered;
@@ -59,37 +92,21 @@ Vec3 directLighting(const Ray &ray, const Hitable &world, const Hitable *light, 
     float pdf;
     int shadowSamples = 4;
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
-      Vec3 shadowAccumulation(0.0f, 0.0f, 0.0f);
+      Vec3 direct =
+          directLighting(shadowSamples, world, light, attenuation, pdf, rec);
 
-      for (int i = 0; i < shadowSamples; ++i)
-      {
-        Vec3 lightSample = light->generateSampleOnSurface();
-        Ray shadowRay(rec.p, Vec3::unit_vector(lightSample - rec.p));
-        HitRecord shadowRec;
-        if (world.hit(shadowRay, 0.001, FLT_MAX, shadowRec))
-        {
-          if (shadowRec.mat_ptr == ((Quad*)light)->material.get())
-          {
-            float lightPdf = light->Pdf();
-            Vec3 Le = shadowRec.mat_ptr->Le(u, v, rec.p);
-            float distanceSquared = (rec.p - shadowRec.p).squared_length();
+      // indirect
+      float scatteredPdf = rec.mat_ptr->ScatteredPdf(ray, rec, scattered);
+      float cosTheta = std::max(Vec3::dot(rec.normal, Vec3::unit_vector(scattered.direction())), 0.0f);
+      Vec3 indirect =  (attenuation * cosTheta *
+        render(scattered, world, light, depth + 1)) /
+        (pdf);
 
-            float G = 1.0f / distanceSquared;
-            shadowAccumulation += (Le * attenuation * pdf * G)  / lightPdf;
-          }
-          else
-          {
-            shadowAccumulation += Vec3(0.0, 0.0, 0.0f);
-          }
-        }
-      }
-      return shadowAccumulation/float(shadowSamples);
-    }
-    else {
+      return direct + indirect;
+    } else {
       return emitted;
     }
-  }
-  else {
+  } else {
     return Vec3(0, 0, 0);
   }
 }
@@ -206,7 +223,7 @@ void RandomScene(HitableList &list) {
 
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(0, 1, 0), 1.0, std::make_unique<Dielectric>(1.5)));
-  
+
   list.list.push_back(std::make_unique<Sphere>(
       Vec3(4, 1, 0), 1.0, std::make_unique<Metal>(Vec3(0.7, 0.6, 0.5), 0.0)));
 }
@@ -345,8 +362,7 @@ void CornellBox(HitableList &list, Hitable *light) {
       Vec3(213.0f, 548.8f, 332.2f), Vec3(213.0f, 548.8f, 227.0f),
       std::make_unique<DiffuseLight>(Vec3(4.0f, 4.0f, 4.0f))));
 
-  //light = list.list[list.list.size() - 1].get();
-  
+  // light = list.list[list.list.size() - 1].get();
 }
 
 int main() {
@@ -354,7 +370,7 @@ int main() {
   os.open("mis.ppm", std::ios::binary);
   const int nx = 512;
   const int ny = 512;
-  const int ns = 64;
+  const int ns = 4;
 
   int *image = new int[nx * ny * 3];
 
@@ -388,8 +404,8 @@ int main() {
         double v = float(j + RAND()) / float(ny);
 
         Ray r = cam.GetRay(u, v);
-        col += directLighting(r, world, light, 0);
-        //col += colourRecursive(r, world, 0);
+        col += render(r, world, light, 0);
+        // col += colourRecursive(r, world, 0);
       }
 
       col /= float(ns);
@@ -408,7 +424,6 @@ int main() {
           int(255.99 * col[2]);  // > 256 ? 256 : int(255.99 * col[2]);
     }
   }
-
 
   for (int i = 0; i < nx * ny * 3; i += 3) {
     os << image[i] << " " << image[i + 1] << " " << image[i + 2] << "\n";
