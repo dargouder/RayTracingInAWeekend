@@ -60,7 +60,7 @@ Vec3 directLighting(int shadowSamples, const Hitable &world,
       if (shadowRec.mat_ptr == ((Quad *)light)->material.get()) {
         float lightPdf = light->Pdf();
         Vec3 Le = shadowRec.mat_ptr->Le(0.0f, 0.0f, rec.p);
-        float distanceSquared = (-shadowRec.p).squared_length();
+        float distanceSquared = (rec.p-shadowRec.p).squared_length();
         float cos_theta_x =
             std::max(Vec3::dot(rec.normal, shadowRay.direction()), 0.0f);
         float cos_theta_y =
@@ -78,7 +78,7 @@ Vec3 directLighting(int shadowSamples, const Hitable &world,
 
 Vec3 indirectLighting(const Ray &ray, const Hitable &world, const Hitable *light, int depth)
 {
-
+  return Vec3(0.0f, 0.0f, 0.0f);
 }
 
 Vec3 render(const Ray &ray, const Hitable &world, const Hitable *light,
@@ -98,11 +98,11 @@ Vec3 render(const Ray &ray, const Hitable &world, const Hitable *light,
       // indirect
       float scatteredPdf = rec.mat_ptr->ScatteredPdf(ray, rec, scattered);
       float cosTheta = std::max(Vec3::dot(rec.normal, Vec3::unit_vector(scattered.direction())), 0.0f);
-      Vec3 indirect =  (attenuation * cosTheta *
+      Vec3 indirect =  (attenuation * scatteredPdf *
         render(scattered, world, light, depth + 1)) /
         (pdf);
 
-      return direct + indirect;
+      return direct; // + indirect;
     } else {
       return emitted;
     }
@@ -367,10 +367,10 @@ void CornellBox(HitableList &list, Hitable *light) {
 
 int main() {
   std::ofstream os;
-  os.open("mis.ppm", std::ios::binary);
+  os.open("converged.ppm", std::ios::binary);
   const int nx = 512;
   const int ny = 512;
-  const int ns = 4;
+  const int ns = 64;
 
   int *image = new int[nx * ny * 3];
 
@@ -395,7 +395,9 @@ int main() {
   Camera cam(lookfrom, lookat, Vec3(0, 1, 0), 35, float(nx / ny), aperture,
              dist_to_focus);
 
+#ifdef NDEBUG
 #pragma omp parallel for
+#endif
   for (int j = ny - 1; j >= 0; j--) {
     for (int i = 0; i < nx; i++) {
       Vec3 col(0.0, 0.0, 0.0);
