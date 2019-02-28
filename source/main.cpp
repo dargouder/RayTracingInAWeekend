@@ -45,6 +45,10 @@ Vec3 directLighting(int shadowSamples, const Hitable &world,
   return shadowAccumulation / float(shadowSamples);
 }
 
+Vec3 indirectLighting(const Hitable &world, Ray scattered,
+                    const Hitable *light, Vec3 attenuation, float pdf,
+                    HitRecord rec, int depth);
+
 Vec3 render(const Ray &ray, const Hitable &world, const Hitable *light,
             int depth) {
   HitRecord rec;
@@ -63,7 +67,9 @@ Vec3 render(const Ray &ray, const Hitable &world, const Hitable *light,
       Vec3 direct =
           directLighting(shadowSamples, world, light, attenuation, pdf, rec);
 
-      return direct;
+      Vec3 indirect = indirectLighting(world, scattered, light, attenuation, pdf, rec, depth);
+
+      return direct + indirect;
     } else {
       // When we hit a light, just return what it emits
       return emitted;
@@ -73,6 +79,12 @@ Vec3 render(const Ray &ray, const Hitable &world, const Hitable *light,
   }
 }
 
+Vec3 indirectLighting(const Hitable &world, Ray scattered,
+                    const Hitable *light, Vec3 attenuation, float pdf,
+                    HitRecord rec, int depth) {
+  float cos_theta = std::max(Vec3::dot(rec.normal, scattered.direction()), 0.0f);
+  return (render(scattered, world, light, depth+1) * attenuation * rec.mat_ptr->ScatteredPdf(Ray(), rec, scattered) * cos_theta) / pdf;
+}
 void CornellBox(HitableList &list, Hitable *light) {
   // floor
   list.list.push_back(std::make_unique<Quad>(
@@ -162,7 +174,7 @@ int main() {
   os.open("directLighting.ppm", std::ios::binary);
   const int nx = 1024;
   const int ny = 1024;
-  const int ns = 64;
+  const int ns = 4;
 
   int *image = new int[nx * ny * 3];
 
