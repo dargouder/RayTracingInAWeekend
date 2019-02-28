@@ -45,11 +45,6 @@ Vec3 directLighting(int shadowSamples, const Hitable &world,
   return shadowAccumulation / float(shadowSamples);
 }
 
-Vec3 indirectLighting(const Ray &ray, const Hitable &world,
-                      const Hitable *light, int depth) {
-  return Vec3(0.0f, 0.0f, 0.0f);
-}
-
 Vec3 render(const Ray &ray, const Hitable &world, const Hitable *light,
             int depth) {
   HitRecord rec;
@@ -63,15 +58,14 @@ Vec3 render(const Ray &ray, const Hitable &world, const Hitable *light,
     float pdf;
     int shadowSamples = 4;
 
-	
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
-    // We hit a normal surface so calculate the direct lighting.
-		Vec3 direct =
+      // We hit a normal surface so calculate the direct lighting.
+      Vec3 direct =
           directLighting(shadowSamples, world, light, attenuation, pdf, rec);
 
       return direct;
     } else {
-		// When we hit a light, just return what it emits
+      // When we hit a light, just return what it emits
       return emitted;
     }
   } else {
@@ -168,7 +162,7 @@ int main() {
   os.open("directLighting.ppm", std::ios::binary);
   const int nx = 1024;
   const int ny = 1024;
-  const int ns = 512;
+  const int ns = 64;
 
   int *image = new int[nx * ny * 3];
 
@@ -208,7 +202,9 @@ int main() {
       col[0] = col[0] > 1 ? 1 : col[0];
       col[1] = col[1] > 1 ? 1 : col[1];
       col[2] = col[2] > 1 ? 1 : col[2];
-      col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
+      float exponent = 1.0f / 2.2f;
+      col = Vec3(powf(col[0], exponent), powf(col[1], exponent),
+                 powf(col[2], exponent));
 
       int y_pixel = ny - j - 1;
       int index = (i + y_pixel * nx) * 3;
