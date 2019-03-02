@@ -16,7 +16,7 @@ public:
 	virtual bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered, float& pdf) const {
 		Vec3 reflected = reflect(Vec3::unit_vector(r_in.direction()), rec.normal);
 		scattered = Ray(rec.p, reflected + fuzz * RandomInUnitSphere());
-		attenuation = m_kd / M_PI;
+		attenuation = m_kd;
 
 		return (Vec3::dot(scattered.direction(), rec.normal) > 0);
 	}

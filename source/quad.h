@@ -130,8 +130,9 @@ public:
 					u * v * m_v11 +
 					(1.0f  - u)* v * m_v01;
 
-		rec.p = poi;
+		
 		rec.t = (poi - r.origin()).length();
+                rec.p = r.point_at_parameter(rec.t);
 
         if(rec.t > tmax)
         {
@@ -142,7 +143,8 @@ public:
 		rec.normal = Vec3::cross(m_v10 - m_v00, m_v01 - m_v00);
 		rec.normal.make_unit_vector();
 		//rec.p = poi;
-		rec.p = poi + Vec3(1, 1, 1)*epsilon + rec.normal;
+	//rec.p = poi;// + rec.normal;
+	//rec.p = poi + Vec3(1, 1, 1)*epsilon + rec.normal;
 		return true;
 	}
 

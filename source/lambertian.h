@@ -20,13 +20,8 @@ public:
 //    }
     bool fr(const Ray &r_in, const HitRecord &rec, Vec3 &attenuation,
             Ray &scattered, float &pdf) const override {
-        ONB uvw;
-        uvw.build_from_w(rec.normal);
-        Vec3 direction = uvw.local(CosineSampleHemisphere2());
-        direction.make_unit_vector();
-        scattered = Ray(rec.p, direction );
-
-        pdf = Vec3::dot(uvw.w(), scattered.direction()) / float(M_PI);
+      Vec3 target = rec.p + rec.normal + RandomInUnitSphere();
+      scattered = Ray(rec.p, target - rec.p);
         attenuation = m_kd;
 
         return true;
