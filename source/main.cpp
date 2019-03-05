@@ -67,9 +67,9 @@ Vec3 render(const Ray &ray, const Hitable &world, const Hitable *light,
       Vec3 direct =
           directLighting(shadowSamples, world, light, attenuation, pdf, rec);
 
-      Vec3 indirect = indirectLighting(world, scattered, light, attenuation, pdf, rec, depth);
+      //Vec3 indirect = indirectLighting(world, scattered, light, attenuation, pdf, rec, depth);
 
-      return direct + indirect;
+      return direct;// + indirect;
     } else {
       // When we hit a light, just return what it emits
       return emitted;
@@ -174,7 +174,7 @@ int main() {
   os.open("directLighting.ppm", std::ios::binary);
   const int nx = 1024;
   const int ny = 1024;
-  const int ns = 4;
+  const int ns = 1;
 
   int *image = new int[nx * ny * 3];
 
