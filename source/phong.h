@@ -1,5 +1,6 @@
 #pragma once
 #include "material.h"
+#include "onb.h"
 
 class Phong : public Material {
  public:
@@ -8,6 +9,9 @@ class Phong : public Material {
   bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation,
           Ray& scattered, float& pdf) const {
     float epsilon = RAND();
+
+	ONB onb;
+    onb.build_from_w(rec.normal);
 
     float u = RAND();
     float v = RAND();
@@ -70,8 +74,9 @@ class Phong : public Material {
 
   Vec3 Le(float u, float v, const Vec3& p) const { return Vec3(0, 0, 0); }
 
-  float ScatteredPdf(const Ray &r_in, const HitRecord &rec, const Ray &scattered) const {
-      return 0;//cos(theta) / M_PI;
+  float ScatteredPdf(const Ray& r_in, const HitRecord& rec,
+                     const Ray& scattered) const {
+    return 0;  // cos(theta) / M_PI;
   }
 
   Vec3 m_kd, m_ks;

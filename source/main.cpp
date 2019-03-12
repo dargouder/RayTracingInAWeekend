@@ -44,20 +44,7 @@ void CornellBox(HitableList &list, Hitable *light) {
       Vec3(10.0f, 0.0f, 10.0f), Vec3(10.0f, 0.0f, -10.0f),
       std::make_unique<Lambertian>(Vec3(0.725f, 0.71f, 0.68f))));
 
-  list.list.push_back(std::make_unique<Quad>(
- Vec3(10.0f, -5.0f, 0.0f),     Vec3(10.0f, 5.0f, 0.0f),  Vec3(-10.0f, 5.0f, 0.0f),  Vec3(-10.0f, -5.0f, 0.0f),
-    
-      std::make_unique<Metal>(Vec3(1.0f, 1.0f, 1.0f), 0.2f)));
-
-    //list.list.push_back(std::make_unique<Quad>(
-    //  Vec3(-10.0f, -5.0f, 0.0f), Vec3(-10.0f, 5.0f, 0.0f),
-    //  Vec3(10.0f, 5.0f, 0.0f), Vec3(10.0f, -5.0f, 0.0f),
-    //  std::make_unique<Lambertian>(Vec3(0.8f, 0.8f, 0.0f))));
-
   list.list.push_back(std::make_unique<Sphere>(Vec3(0.0f, 0.5f, 0.5f), 0.5f, std::make_unique<Lambertian>(Vec3(0.0f, 0.0f, 1.0f))));
-  //list.list.push_back(std::make_unique<Sphere>(
-  //    Vec3(0.0f, 0.5f, 0.5f), 0.5,
-  //    std::make_unique<Metal>(Vec3(1.0f, 1.0f, 1.0f), 0.0f)));
 }
 
 int main() {
@@ -65,7 +52,7 @@ int main() {
   os.open("directLighting.ppm", std::ios::binary);
   const int nx = 512;
   const int ny = 512;
-  const int ns = 512;
+  const int ns = 64;
 
   int *image = new int[nx * ny * 3];
 
