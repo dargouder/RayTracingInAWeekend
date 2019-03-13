@@ -44,7 +44,7 @@ void CornellBox(HitableList &list, Hitable *light) {
       Vec3(10.0f, 0.0f, 10.0f), Vec3(10.0f, 0.0f, -10.0f),
       std::make_unique<Lambertian>(Vec3(0.725f, 0.71f, 0.68f))));
 
-  list.list.push_back(std::make_unique<Sphere>(Vec3(0.0f, 0.5f, 0.5f), 0.5f, std::make_unique<Lambertian>(Vec3(0.0f, 0.0f, 1.0f))));
+  list.list.push_back(std::make_unique<Sphere>(Vec3(0.0f, 0.5f, 0.5f), 0.5f, std::make_unique<Phong>(Vec3(0.0f, 0.9f, 0.0f), Vec3(0.0f, 0.0f, 0.0f))));
 }
 
 int main() {
@@ -67,7 +67,7 @@ int main() {
 
   light = world.list[world.list.size() - 1].get();
 
-  Vec3 lookfrom(8.0f, 0.5f, 2.0f), lookat(0.0f, 0.5f, 0.5f);
+  Vec3 lookfrom(3.0f, 0.5f, 2.0f), lookat(0.0f, 0.5f, 0.5f);
 
   float dist_to_focus = (lookfrom - lookat).length();
   float aperture = 0.0f;

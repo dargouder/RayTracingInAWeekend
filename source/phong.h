@@ -29,13 +29,9 @@ class Phong : public Material {
     pdf = 0.0f;
     if (epsilon < diffuse_lum) {
       // Diffuse component
-      float sin_theta = sqrtf(1 - u);
-      float phi = 2 * M_PI * v;
-      float cos_phi = std::cos(phi);
-      float sin_phi = std::sin(phi);
 
-      scattered_dir =
-          rec.normal + Vec3(sin_theta * cos_phi, sin_theta * sin_phi, sqrt(u));
+
+      scattered_dir = onb.local(CosineSampleHemisphere());
       scattered_dir.make_unit_vector();
 
       pdf = Vec3::dot(scattered_dir, rec.normal) / M_PI;
