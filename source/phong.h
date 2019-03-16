@@ -12,9 +12,11 @@ class Phong : public Material {
     ONB onb;
     onb.build_from_w(rec.normal);
 
+    // compute single luminance value to see how much we will reflect
     float diffuse_lum = m_kd.getLuminance();
     float specular_lum = m_ks.getLuminance();
 
+    // calculate the perfect specular reflection
     Vec3 perfectReflection =
         reflect(Vec3::unit_vector(r_in.direction()), rec.normal);
     perfectReflection.make_unit_vector();
@@ -24,10 +26,11 @@ class Phong : public Material {
 
     pdf = 0.0f;
 
+    // generate a random number to see whether we will reflect with specular or diffuse
     float reflectionDecision = RAND();
 
     if (reflectionDecision < diffuse_lum) {
-      // Diffuse component
+      // calculating only diffuse component
       float u = RAND();
       float v = RAND();
 
@@ -36,7 +39,7 @@ class Phong : public Material {
 
       pdf = Vec3::dot(scatteredDir, rec.normal) / M_PI;
     } else if (reflectionDecision <= diffuse_lum + specular_lum) {
-      // Specular component
+      // calculating only specular component
       float u = RAND();
       float v = RAND();
       float sin_alpha = std::sqrt(1 - std::pow(u, 2.0f / (n + 1.0f)));
@@ -57,12 +60,15 @@ class Phong : public Material {
       attenuation = Vec3(0.0f, 0.0f, 0.0f);
       return false;
     }
+
+    // the alpha for the specular reflection
     float alpha;
     scattered = Ray(rec.p, scatteredDir);
     alpha = Vec3::dot(perfectReflection, perfectReflection);
 
     alpha = alpha > 2 * M_PI ? 2 * M_PI : alpha;
 
+    // calculate the fr
     attenuation =
         m_kd / M_PI + m_ks * (n + 2.0f) / (2.0f * M_PI) * pow(cos(alpha), n);
 
