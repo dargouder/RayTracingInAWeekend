@@ -2,22 +2,20 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <random>
 
 #ifdef _WIN32
-const float M_PI = 3.142;
+const float M_PI = 3.1415926535;
 #endif
+
+static std::random_device
+    rd;  // Will be used to obtain a seed for the random number engine
 
 inline double RAND() {
-#ifdef _WIN32
-
-  float rt = 0.0;
-  rt = (float)(rand() % 1000);
-  rt /= 1000;
-
-  return rt;
-#else
-  return drand48();
-#endif
+  static std::mt19937 gen(
+      rd());  // Standard mersenne_twister_engine seeded with rd()
+  static std::uniform_real_distribution<> dis(0.0, 1.0);
+  return dis(gen);
 }
 
 inline float schlick(float cosine, float ref_idx) {
@@ -27,10 +25,6 @@ inline float schlick(float cosine, float ref_idx) {
   return r0 + (1 - r0) * cos_res * cos_res * cos_res * cos_res * cos_res;
 }
 
-//#ifdef __linux__
-//#else
-// const float M_PI = 3.14159265358979323846;
-//#endif
 class Vec3 {
  public:
   float e[3];
@@ -164,29 +158,38 @@ static Vec3 reflect(const Vec3& v, const Vec3& n) {
   return v - 2 * Vec3::dot(v, n) * n;
 }
 
-static Vec3 CosineSampleHemisphere() {
-  float u = RAND();
-  float v = RAND();
+static Vec3 CosineSampleHemisphere(float u, float v) {
   float z = sqrt(1 - v);
   float phi = 2 * M_PI * u;
+
   float x = cos(phi) * 2 * sqrt(v);
   float y = sin(phi) * 2 * sqrt(v);
+
   return Vec3(x, y, z);
 }
 
-static Vec3 CosineSampleHemisphere2()
-{
-  float u = RAND();
-  float v = RAND();
+static Vec3 CosineSampleHemispherePhong(float u, float v) {
+  const float alpha = sqrt(1.0f - u);
+  const float beta = 2 * M_PI * v;
+
+  const float x = alpha * cos(beta);
+  const float y = alpha * sin(beta);
+  const float z = sqrt(u);
+
+  return Vec3(x, y, z);
+}
+
+static Vec3 CosineSampleHemisphereDriscoll(float u, float v) {
+
 
   const float r = sqrt(u);
   const float theta = 2 * M_PI * v;
 
   const float x = r * cos(theta);
   const float y = r * sin(theta);
+  const float z = sqrt(1 - u);
 
-  return Vec3(x, y, sqrt(std::max(0.0f, 1 - u)));
-
+  return Vec3(x, y, z);
 }
 
 static Vec3 RandomInUnitSphere() {

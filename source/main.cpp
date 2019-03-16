@@ -21,15 +21,17 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     Vec3 attenuation;
     float u = 0.0f, v = 0.0f;
     rec.normal.make_unit_vector();
-
+    Vec3 emitted = rec.mat_ptr->Le(0, 0, rec.p);
     float pdf;
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
-            return 
-                   attenuation * colourRecursive(scattered, world, depth + 1);
+
+      Vec3 f = attenuation / pdf;
+      float cos_theta = Vec3::dot(rec.normal, scattered.direction());
+      return emitted + f * cos_theta * colourRecursive(scattered, world, depth+1);
+    } else {
+      return emitted;
     }
-    return Vec3(0.0f, 0.0f, 0.0f);
   } else {
-    
     Vec3 unit_direction = Vec3::unit_vector(ray.direction());
     float t = 0.5f * (unit_direction.y() + 1.0f);
     Vec3 col = (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
@@ -37,14 +39,40 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
   }
 }
 
-void CornellBox(HitableList &list, Hitable *light) {
+Vec3 colourRecursiveOld(const Ray &ray, const Hitable &world, int depth) {
+  HitRecord rec;
+  if (world.hit(ray, 0.001, FLT_MAX, rec)) {
+    Ray scattered;
+    Vec3 attenuation;
+    float u = 0.0f, v = 0.0f;
+    rec.normal.make_unit_vector();
+    Vec3 emitted = rec.mat_ptr->Le(0, 0, rec.p);
+    float pdf;
+    if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
+      return emitted +
+             attenuation * colourRecursive(scattered, world, depth + 1);
+    } else {
+      return emitted;
+    }
+  } else {
+    Vec3 unit_direction = Vec3::unit_vector(ray.direction());
+    float t = 0.5f * (unit_direction.y() + 1.0f);
+    Vec3 col = (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
+    return col;
+  }
+}
+
+void CornellBox(HitableList &list, Hitable **light) {
   // floor
   list.list.push_back(std::make_unique<Quad>(
       Vec3(-10.0f, 0.0f, -10.0f), Vec3(-10.0f, 0.0f, 10.0f),
       Vec3(10.0f, 0.0f, 10.0f), Vec3(10.0f, 0.0f, -10.0f),
       std::make_unique<Lambertian>(Vec3(0.725f, 0.71f, 0.68f))));
-
-  list.list.push_back(std::make_unique<Sphere>(Vec3(0.0f, 0.5f, 0.5f), 0.5f, std::make_unique<Phong>(Vec3(0.0f, 0.9f, 0.0f), Vec3(0.0f, 0.0f, 0.0f))));
+ // list.list.push_back(std::make_unique<Sphere>(
+ //     Vec3(0.0f, 0.5f, 0.5f), 0.5f,
+ //     std::make_unique<Lambertian>(Vec3(0.0f, 0.9f, 0.0f))));
+   list.list.push_back(std::make_unique<Sphere>(Vec3(0.0f, 0.5f, 0.5f), 0.5f,
+   std::make_unique<Phong>(Vec3(0.0f, 0.5f, 0.0f), Vec3(0.0f, 0.3f, 0.0f))));
 }
 
 int main() {
@@ -63,11 +91,11 @@ int main() {
   HitableList world;
   Hitable *light = nullptr;
 
-  CornellBox(world, light);
+  CornellBox(world, &light);
 
   light = world.list[world.list.size() - 1].get();
 
-  Vec3 lookfrom(3.0f, 0.5f, 2.0f), lookat(0.0f, 0.5f, 0.5f);
+  Vec3 lookfrom(0.0f, 4.5f, -4.0f), lookat(0.0f, 0.5f, 0.5f);
 
   float dist_to_focus = (lookfrom - lookat).length();
   float aperture = 0.0f;
@@ -83,6 +111,8 @@ int main() {
       for (int s = 0; s < ns; s++) {
         double u = float(i + RAND()) / float(nx);
         double v = float(j + RAND()) / float(ny);
+        //       double u = float(i) / float(nx);
+        //        double v = float(j) / float(ny);
 
         Ray r = cam.GetRay(u, v);
         col += colourRecursive(r, world, 0);
