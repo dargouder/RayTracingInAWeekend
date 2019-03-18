@@ -26,6 +26,7 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
     if (depth < 10 && rec.mat_ptr->fr(ray, rec, attenuation, scattered, pdf)) {
 
       Vec3 f = attenuation / pdf;
+      assert(pdf > 0);
       float cos_theta = Vec3::dot(rec.normal, scattered.direction());
       return emitted + f * cos_theta * colourRecursive(scattered, world, depth+1);
     } else {
@@ -72,7 +73,7 @@ void CornellBox(HitableList &list, Hitable **light) {
  //     Vec3(0.0f, 0.5f, 0.5f), 0.5f,
  //     std::make_unique<Lambertian>(Vec3(0.0f, 0.9f, 0.0f))));
    list.list.push_back(std::make_unique<Sphere>(Vec3(0.0f, 0.5f, 0.5f), 0.5f,
-   std::make_unique<Phong>(Vec3(0.0f, 0.5f, 0.0f), Vec3(0.0f, 0.3f, 0.0f))));
+   std::make_unique<Phong>(Vec3(0.0f, 0.2f, 0.0f), Vec3(0.0f, 0.1f, 0.0f))));
 }
 
 int main() {
