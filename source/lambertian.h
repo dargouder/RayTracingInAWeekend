@@ -7,8 +7,12 @@ class Lambertian : public Material {
 public:
     explicit Lambertian(const Vec3 &a) : m_kd(a) {}
 
+    virtual Vec3 f(const Vec3& wo, const Vec3& wi) const
+    {
+      return Vec3(0,0,0);
+    }
 
-    bool fr(const Ray &r_in, const HitRecord &rec, Vec3 &attenuation,
+    bool sample_f(const Ray &r_in, const HitRecord &rec, Vec3 &attenuation,
             Ray &scattered, float &pdf) const override 
     {
       ONB onb;
@@ -35,6 +39,11 @@ public:
            return 0;
         }
         return cosine / float(M_PI);
+    }
+
+    float pdf(const Vec3& wo, const Vec3& wi) const override
+    {
+      return Vec3::dot(Vec3(0,0,1), wi) / M_PI;
     }
 
     Vec3 m_kd;

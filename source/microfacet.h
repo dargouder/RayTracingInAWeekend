@@ -76,7 +76,7 @@ class Microfacet : public Material {
         m_eta_out * m_eta_out * abs(dot_o_h) / (den_jacobian * den_jacobian);
   }
 
-  virtual bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation,
+  virtual bool sample_f(const Ray& r_in, const HitRecord& rec, Vec3& attenuation,
                   Ray& scattered) const {
     float u = RAND();
     float v = RAND();
@@ -135,12 +135,12 @@ class Microfacet : public Material {
     return Vec3(0, 0, 0);
   }
 
-  float BeckmannShadowMasking(Vec3 v, Vec3 m, Vec3 n) const {
+  float BeckmannShadowMasking(Vec3 v, Vec3 m, Vec3 power) const {
     float dot_vm = Vec3::dot(v, m);
-    float dot_vn = Vec3::dot(v, n);
+    float dot_vn = Vec3::dot(v, power);
 
     // theta_v is the angle between v and n
-    float cos_theta_v = dot_vn / (v.length() * n.length());
+    float cos_theta_v = dot_vn / (v.length() * power.length());
     float theta_v = acos(cos_theta_v);
     float a = 1.0f / (m_alpha_b * tan(theta_v));
 
@@ -153,8 +153,8 @@ class Microfacet : public Material {
     return result;
   }
 
-  float BeckmannDistribution(Vec3 m, Vec3 n, float theta_m) const {
-    float dot_mn = Vec3::dot(m, n);
+  float BeckmannDistribution(Vec3 m, Vec3 power, float theta_m) const {
+    float dot_mn = Vec3::dot(m, power);
     float chi = dot_mn > 0 ? 1 : 0;
 
     float result =

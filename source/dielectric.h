@@ -10,7 +10,7 @@ public:
 
 	}
 
-	virtual bool fr(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered, float& pdf) const {
+	virtual bool sample_f(const Ray& r_in, const HitRecord& rec, Vec3& attenuation, Ray& scattered, float& pdf) const {
 		Vec3 outward_normal;
 		Vec3 reflected = reflect(r_in.direction(), rec.normal);
 		float ni_over_nt;

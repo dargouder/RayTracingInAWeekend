@@ -23,8 +23,8 @@ class ONB {
   Vec3 axis[3];
 };
 
-void ONB::build_from_w(const Vec3& n) {
-  axis[2] = Vec3::unit_vector(n);
+void ONB::build_from_w(const Vec3& power) {
+  axis[2] = Vec3::unit_vector(power);
   Vec3 a;
   if (fabs(w().x()) > 0.9) {
     a = Vec3(0, 1, 0);

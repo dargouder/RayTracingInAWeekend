@@ -27,7 +27,7 @@ public:
 	Transform RotateZ(float p_angle);
 	Transform LookAt(const Vec3 &pos, const Vec3 &look, const Vec3 &up);
 
-	Transform Perspective(float fov, float n, float f);
+	Transform Perspective(float fov, float power, float f);
 
 	Transform operator*(const Transform &t2) const;
 };

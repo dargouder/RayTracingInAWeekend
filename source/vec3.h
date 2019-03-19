@@ -25,6 +25,10 @@ inline float schlick(float cosine, float ref_idx) {
   return r0 + (1 - r0) * cos_res * cos_res * cos_res * cos_res * cos_res;
 }
 
+inline float clamp(float power, float max, float min) {
+  return std::min(max, std::max(min, power));
+}
+
 class Vec3 {
  public:
   float e[3];
@@ -128,6 +132,10 @@ class Vec3 {
     return v1.e[0] * v2.e[0] + v1.e[1] * v2.e[1] + v1.e[2] * v2.e[2];
   }
 
+  inline static float satDot(const Vec3& v1, const Vec3& v2) {
+    return clamp(dot(v1, v2), 0.0f, 1.0f);
+  }
+
   inline static Vec3 cross(const Vec3& v1, const Vec3& v2) {
     return Vec3((v1.e[1] * v2.e[2]) - (v1.e[2] * v2.e[1]),
                 -((v1.e[0] * v2.e[2]) - (v1.e[2] * v2.e[0])),
@@ -154,8 +162,15 @@ inline Vec3 RandomInUnitDisk() {
   return p;
 }
 
-static Vec3 reflect(const Vec3& v, const Vec3& n) {
-  return v - 2 * Vec3::dot(v, n) * n;
+static Vec3 reflect(const Vec3& wo, const Vec3& n) {
+  return -wo + 2 * Vec3::dot(n, wo) * n;
+}
+
+static Vec3 UniformSampleHemisphere(float u1, float u2) {
+  const float r = std::sqrt(1.0f - u1 * u1);
+  const float phi = 2 * M_PI * u2;
+
+  return Vec3(cos(phi) * r, sin(phi) * r, u1);
 }
 
 static Vec3 CosineSampleHemisphere(float u, float v) {
@@ -169,7 +184,7 @@ static Vec3 CosineSampleHemisphere(float u, float v) {
 }
 
 static Vec3 CosineSampleHemispherePhong(float u, float v) {
-  const float alpha = sqrt(1.0f - u);
+  const float alpha = sqrtf(1.0f - u);
   const float beta = 2 * M_PI * v;
 
   const float x = alpha * cos(beta);
@@ -180,8 +195,6 @@ static Vec3 CosineSampleHemispherePhong(float u, float v) {
 }
 
 static Vec3 CosineSampleHemisphereDriscoll(float u, float v) {
-
-
   const float r = sqrt(u);
   const float theta = 2 * M_PI * v;
 
@@ -189,6 +202,15 @@ static Vec3 CosineSampleHemisphereDriscoll(float u, float v) {
   const float y = r * sin(theta);
   const float z = sqrt(1 - u);
 
+  return Vec3(x, y, z);
+}
+
+static Vec3 UniformSampleSphere(float u, float v) {
+  float theta = 2 * M_PI * u;
+  float phi = acos(1 - 2 * v);
+  float x = sin(phi) * cos(theta);
+  float y = sin(phi) * sin(theta);
+  float z = cos(phi);
   return Vec3(x, y, z);
 }
 
@@ -200,15 +222,20 @@ static Vec3 RandomInUnitSphere() {
   return p;
 }
 
-static bool refract(const Vec3& v, const Vec3& n, float ni_over_nt,
+static bool refract(const Vec3& v, const Vec3& power, float ni_over_nt,
                     Vec3& refracted) {
   Vec3 uv = Vec3::unit_vector(v);
-  float dt = Vec3::dot(uv, n);
+  float dt = Vec3::dot(uv, power);
   float discriminant = 1.0 - ni_over_nt * ni_over_nt * (1 - dt * dt);
   if (discriminant > 0) {
-    refracted = ni_over_nt * (uv - n * dt) - n * sqrt(discriminant);
+    refracted = ni_over_nt * (uv - power * dt) - power * sqrt(discriminant);
     return true;
   } else {
     return false;
   }
+}
+
+inline float AbsCosTheta(const Vec3 &w)
+{
+  return fabsf(w.y());
 }

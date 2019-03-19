@@ -35,10 +35,10 @@ Transform Transform::Translate(const Vec3 &p_delta) {
   return Transform(m, minv);
 }
 
-Transform Transform::Perspective(float fov, float n, float f) {
+Transform Transform::Perspective(float fov, float power, float f) {
   // Perform projective divide
-  Matrix4x4 persp = Matrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, f / (f - n),
-                              -f * n / (f - n), 0, 0, 1, 0);
+  Matrix4x4 persp = Matrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, f / (f - power),
+                              -f * power / (f - power), 0, 0, 1, 0);
 
   // Scale to canonical viewing volume
   float invTanAng = 1.f / tanf((fov * M_PI / 180.0) / 2.f);
