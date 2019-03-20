@@ -51,7 +51,7 @@ class Phong : public Material {
       scatteredDir = onb.local(CosineSampleHemispherePhong(u, v));
       scatteredDir.make_unit_vector();
 
-      pdf = Vec3::dot(scatteredDir, rec.normal) / M_PI;
+      pdf = Vec3::dot(scatteredDir, rec.normal) * INV_PI;
     } else {
       // calculating only specular component
       float u = RAND();
@@ -69,17 +69,18 @@ class Phong : public Material {
 
       float alpha = Vec3::dot(scatteredDir, perfectReflection);
 
-      alpha = clamp(alpha, M_PI / 2.0f, 0.0f);
+      alpha = clamp(alpha, 1.0f, 0.0f);
 
       if (alpha > 0) {
         pdf = ((power + 1.0f) / (2.0f * M_PI)) * powf(alpha, power);
+        attenuation +=
+            m_ks * (power + 2.0f) * INV_2PI * pow(alpha, power);
       }
 
       // calculate the fr
-      if (pdf > 0) {
-        attenuation +=
-            m_ks * (power + 2.0f) * (1.0f / (2.0f * M_PI)) * pow(alpha, power);
-      }
+
+
+
     }
     //pdf = calcPdf(r_in.direction(), scatteredDir, rec.normal);
     scattered = Ray(rec.p, scatteredDir);
@@ -94,8 +95,8 @@ class Phong : public Material {
     return 0;  // cos(theta) / M_PI;
   }
 
-  float calcPdf(const Vec3& wo, const Vec3& wi, const Vec3& normal) const {
-    const float diffusePDF = Vec3::dot(wi, normal) / M_PI;
+  float pdf(const Vec3& wo, const Vec3& wi) const {
+    //const float diffusePDF = Vec3::dot(wi, normal) / M_PI;
     return 0.0f;
   }
 

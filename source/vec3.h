@@ -8,6 +8,9 @@
 const float M_PI = 3.1415926535;
 #endif
 
+static const float INV_PI = 1.0f / M_PI;
+static const float INV_2PI = INV_PI * 0.5f;
+
 static std::random_device
     rd;  // Will be used to obtain a seed for the random number engine
 
