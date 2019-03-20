@@ -22,7 +22,7 @@ class Camera {
 
 		Ray GetRay(float s, float t){
 			Vec3 rd = lens_radius * RandomInUnitDisk();
-			Vec3 offset = u * rd.x() + v * rd.y();
+			Vec3 offset = u * rd.x + v * rd.y;
 			return Ray(origin + offset,
 				lower_left_corner + s*horizontal +
 				t*vertical - origin - offset);

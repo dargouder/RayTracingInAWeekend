@@ -77,17 +77,17 @@ class Quad : public Hitable {
     float alpha11, beta11;
 
     Vec3 N = Vec3::cross(E01, E03);
-    if ((std::abs(N.x()) >= std::abs(N.y())) &&
-        (std::abs(N.x()) >= std::abs(N.z()))) {
-      alpha11 = (E02.y() * E03.z() - E02.z() * E03.y()) / N.x();
-      beta11 = (E01.y() * E02.z() - E01.z() * E02.y()) / N.x();
-    } else if ((std::abs(N.y()) >= std::abs(N.x())) &&
-               (std::abs(N.y()) >= std::abs(N.z()))) {
-      alpha11 = (E02.z() * E03.x() - E02.x() * E03.z()) / N.y();
-      beta11 = (E01.z() * E02.x() - E01.x() * E02.z()) / N.y();
+    if ((std::abs(N.x) >= std::abs(N.y)) &&
+        (std::abs(N.x) >= std::abs(N.z))) {
+      alpha11 = (E02.y * E03.z - E02.z * E03.y) / N.x;
+      beta11 = (E01.y * E02.z - E01.z * E02.y) / N.x;
+    } else if ((std::abs(N.y) >= std::abs(N.x)) &&
+               (std::abs(N.y) >= std::abs(N.z))) {
+      alpha11 = (E02.z * E03.x - E02.x * E03.z) / N.y;
+      beta11 = (E01.z * E02.x - E01.x * E02.z) / N.y;
     } else {
-      alpha11 = (E02.x() * E03.y() - E02.y() * E03.x()) / N.z();
-      beta11 = (E01.x() * E02.y() - E01.y() * E02.x()) / N.z();
+      alpha11 = (E02.x * E03.y - E02.y * E03.x) / N.z;
+      beta11 = (E01.x * E02.y - E01.y * E02.x) / N.z;
     }
 
     // Compute the bilinear coordinaes of the intersection point

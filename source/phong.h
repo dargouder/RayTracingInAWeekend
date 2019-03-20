@@ -7,7 +7,7 @@
 class Phong : public Material {
  public:
   Phong(const Vec3& a, const Vec3& ks) : m_kd(a), m_ks(ks) {
-    power = 1;
+    power = 50;
     diffuseRatio =
         m_kd.getLuminance() / (m_kd.getLuminance() + m_ks.getLuminance());
     const Vec3 combined = m_kd + m_ks;
@@ -17,12 +17,14 @@ class Phong : public Material {
     assert(combined.b() <= 1);
   }
 
-  virtual Vec3 f(const Vec3& wo, const Vec3& wi) const { return Vec3(0.0f, 0.0f, 0.0f); }
+  virtual Vec3 f(const Vec3& wo, const Vec3& wi) const {
+    return Vec3(0.0f, 0.0f, 0.0f);
+  }
 
   bool sample_f(const Ray& r_in, const HitRecord& rec, Vec3& attenuation,
                 Ray& scattered, float& pdf) const {
     ONB onb;
-    onb.build_from_w(rec.normal);
+    onb.branchlessONB(rec.normal);
 
     // compute single luminance value to see how much we will reflect
     float diffuse_lum = m_kd.getLuminance();
@@ -67,22 +69,14 @@ class Phong : public Material {
           onb.local(Vec3(sin_alpha * cos_phi, sin_alpha * sin_phi, cos_alpha));
       scatteredDir.make_unit_vector();
 
-      float alpha = Vec3::dot(scatteredDir, perfectReflection);
+      float cos_theta = Vec3::dot(scatteredDir, perfectReflection);
 
-      alpha = clamp(alpha, 1.0f, 0.0f);
+      cos_theta = clamp(cos_theta, M_PI / 2.0f, -M_PI / 2.0f);
 
-      if (alpha > 0) {
-        pdf = ((power + 1.0f) / (2.0f * M_PI)) * powf(alpha, power);
-        attenuation +=
-            m_ks * (power + 2.0f) * INV_2PI * pow(alpha, power);
-      }
-
-      // calculate the fr
-
-
-
+      pdf = (power + 2.0f) * INV_2PI * powf(cos_theta, power + 1.0f);
+      attenuation += m_ks * (power + 2.0f) * INV_2PI * pow(cos_theta, power);
     }
-    //pdf = calcPdf(r_in.direction(), scatteredDir, rec.normal);
+    pdf = std::max(pdf, 0.00001f);
     scattered = Ray(rec.p, scatteredDir);
 
     return true;
@@ -96,7 +90,7 @@ class Phong : public Material {
   }
 
   float pdf(const Vec3& wo, const Vec3& wi) const {
-    //const float diffusePDF = Vec3::dot(wi, normal) / M_PI;
+    // const float diffusePDF = Vec3::dot(wi, normal) / M_PI;
     return 0.0f;
   }
 

@@ -16,11 +16,12 @@ public:
             Ray &scattered, float &pdf) const override 
     {
       ONB onb;
-      onb.build_from_w(rec.normal);
+      //onb.build_from_w(rec.normal);
+      onb.branchlessONB(rec.normal);
 
       float u = RAND();
       float v = RAND();
-      Vec3 generatedCosinePoint = CosineSampleHemispherePhong(u, v);
+      Vec3 generatedCosinePoint = CosineSampleHemispherePBRT(u, v);
       Vec3 transformedPoint = onb.local(generatedCosinePoint);
       Vec3 target = Vec3::unit_vector(transformedPoint);
 
