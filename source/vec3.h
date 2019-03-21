@@ -5,13 +5,14 @@
 #include <random>
 
 #ifdef _WIN32
-const float M_PI = 3.1415926535;
+const float M_PI =
 #endif
 
-static const float INV_PI = 1.0f / M_PI;
-static const float INV_2PI = 1.0f / (2.0f * M_PI);
-static const float PiOver4 = M_PI / 4.0f;
-static const float PiOver2 = M_PI / 2.0f;
+static const float PI = 3.1415926535f;
+static const float INV_PI = 1.0f / PI;
+static const float INV_2PI = 1.0f / (2.0f * PI);
+static const float PiOver4 = PI / 4.0f;
+static const float PiOver2 = PI / 2.0f;
 
 static std::random_device
     rd;  // Will be used to obtain a seed for the random number engine
@@ -254,6 +255,22 @@ static bool refract(const Vec3& v, const Vec3& power, float ni_over_nt,
   } else {
     return false;
   }
+}
+
+inline static Vec3 SphericalDirection(float sinTheta, float cosTheta, float phi)
+{
+  return Vec3(sinTheta * std::cos(phi), sinTheta * std::sin(phi), cos(phi));
+}
+
+inline static float SphericalTheta(const Vec3 &v)
+{
+  return std::acos(clamp(v.z, 1, -1));
+}
+
+inline static float SphericalPhi(const Vec3 &v)
+{
+  float p = std::atan2(v.y, v.x);
+  return (p < 0) ? p + 2 * PI : p;
 }
 
 inline float AbsCosTheta(const Vec3& w) { return fabsf(w.y); }
