@@ -5,9 +5,9 @@ class Camera {
 	public:
 		Camera(Vec3 lookfrom, Vec3 lookat, Vec3 vup, float vfov, float aspect,
 			float aperture, float focus_dist) {
-			lens_radius = aperture / 2.0;
-			float theta = vfov * M_PI/180.0;
-			float half_height = tan(theta/2.0);
+			lens_radius = aperture / 2.0f;
+			float theta = vfov * PI/180.0f;
+			float half_height = tan(theta/2.0f);
 			float half_width = aspect * half_height;
 			origin = lookfrom;
 			w = Vec3::unit_vector(lookfrom - lookat);
@@ -17,7 +17,6 @@ class Camera {
 								half_height * focus_dist * v - focus_dist * w;
 			horizontal = 2 * half_width * focus_dist * u;
 			vertical = 2 * half_height * focus_dist * v;
-
 		}
 
 		Ray GetRay(float s, float t){

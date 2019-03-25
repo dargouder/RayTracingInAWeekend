@@ -7,9 +7,9 @@ class Sphere : public Hitable {
 public:
 	Vec3 center;
 	float radius;
-	std::unique_ptr<Material> material;
+	std::unique_ptr<BxDF> material;
 	Sphere() {}
-	Sphere(Vec3 cen, float r, std::unique_ptr<Material> mat) : center(cen), radius(r), material(std::move(mat)) {}
+	Sphere(Vec3 cen, float r, std::unique_ptr<BxDF> mat) : center(cen), radius(r), material(std::move(mat)) {}
 
 	bool hit(const Ray& r, float tmin, float tmax, HitRecord& rec) const {
 		Vec3 oc = r.origin() - center;
@@ -25,7 +25,7 @@ public:
 				rec.p = r.point_at_parameter(rec.t);
 				rec.normal = (rec.p - center) / radius;
                 rec.normal.make_unit_vector();
-				rec.mat_ptr = material.get();
+				rec.bxdf = material.get();
 				return true;
 			}
 		
@@ -35,7 +35,7 @@ public:
 				rec.p = r.point_at_parameter(rec.t);
 				rec.normal = (rec.p - center) / radius;
                 rec.normal.make_unit_vector();
-				rec.mat_ptr = material.get();
+				rec.bxdf = material.get();
 				return true;
 			}
 		}
@@ -49,7 +49,7 @@ public:
 
   float Pdf() const
   {
-    return 4 * M_PI * radius * radius;
+    return 4 * PI * radius * radius;
   }
 
 };

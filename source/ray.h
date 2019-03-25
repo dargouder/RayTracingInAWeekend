@@ -18,3 +18,8 @@ public:
 	Vec3 A;
 	Vec3 B;
 };
+
+inline Vec3 OffsetRayOrigin(const Vec3 &p, const Vec3 &pError, const Vec3 &normal, const Vec3 &w)
+{
+
+}

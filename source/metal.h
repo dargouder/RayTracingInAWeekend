@@ -25,6 +25,6 @@ public:
 
   float ScatteredPdf(const Ray &r_in, const HitRecord &rec, const Ray &scattered) const
   {
-    return 0;//cos(theta) * fuzz / M_PI;
+    return 1; //cos(theta)  fuzz / M_PI;
   }
 };

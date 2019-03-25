@@ -41,7 +41,7 @@ Transform Transform::Perspective(float fov, float power, float f) {
                               -f * power / (f - power), 0, 0, 1, 0);
 
   // Scale to canonical viewing volume
-  float invTanAng = 1.f / tanf((fov * M_PI / 180.0) / 2.f);
+  float invTanAng = 1.f / tanf((fov * PI / 180.0) / 2.f);
   return Scale(invTanAng, invTanAng, 1) * Transform(persp);
 }
 
@@ -103,16 +103,16 @@ Ray Transform::operator()(const Ray &p_ray) const {
 }
 
 Transform Transform::RotateX(float p_angle) {
-  float sin_t = sinf(M_PI / 180 * p_angle);
-  float cos_t = cosf((M_PI / 180 * p_angle));
+  float sin_t = sinf(PI / 180 * p_angle);
+  float cos_t = cosf((PI / 180 * p_angle));
 
   Matrix4x4 m(1, 0, 0, 0, 0, cos_t, -sin_t, 0, 0, sin_t, cos_t, 0, 0, 0, 0, 1);
 
   return Transform(m, m.Transpose());
 }
 Transform Transform::RotateY(float p_angle) {
-  float sin_t = sinf((M_PI / 180 * p_angle));
-  float cos_t = cosf((M_PI / 180 * p_angle));
+  float sin_t = sinf((PI / 180 * p_angle));
+  float cos_t = cosf((PI / 180 * p_angle));
 
   Matrix4x4 m(1, 0, 0, 0, 0, cos_t, -sin_t, 0, 0, sin_t, cos_t, 0, 0, 0, 0, 1);
 
@@ -120,8 +120,8 @@ Transform Transform::RotateY(float p_angle) {
 }
 Transform Transform::RotateZ(float p_angle) {
 
-  float sin_t = sinf((M_PI / 180 * p_angle));
-  float cos_t = cosf((M_PI / 180 * p_angle));
+  float sin_t = sinf((PI / 180 * p_angle));
+  float cos_t = cosf((PI / 180 * p_angle));
 
   Matrix4x4 m(1, 0, 0, 0, 0, cos_t, -sin_t, 0, 0, sin_t, cos_t, 0, 0, 0, 0, 1);
 

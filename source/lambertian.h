@@ -26,8 +26,8 @@ public:
       Vec3 target = Vec3::unit_vector(transformedPoint);
 
       scattered = Ray(rec.p, target);
-      attenuation = m_kd / M_PI;
-      pdf = Vec3::dot(rec.normal, scattered.direction()) / M_PI;
+      attenuation = m_kd / PI;
+      pdf = Vec3::dot(rec.normal, scattered.direction()) / PI;
       return true;
     }
 
@@ -39,12 +39,12 @@ public:
         if (cosine < 0) {
            return 0;
         }
-        return cosine / float(M_PI);
+        return cosine / float(PI);
     }
 
     float pdf(const Vec3& wo, const Vec3& wi) const override
     {
-      return Vec3::dot(Vec3(0,0,1), wi) / M_PI;
+      return Vec3::dot(Vec3(0,0,1), wi) / PI;
     }
 
     Vec3 m_kd;

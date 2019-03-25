@@ -82,7 +82,7 @@ class Microfacet : public Material {
     float v = RAND();
 
     float theta_m = atan(sqrtf(-(m_alpha_b * m_alpha_b * log(1 - u))));
-    float phi_m = 2 * M_PI * v;
+    float phi_m = 2 * PI * v;
 
     Vec3 microsurface_normal =
         Vec3(cos(theta_m) * cos(phi_m), sin(theta_m) * cos(phi_m), cos(phi_m));
@@ -158,7 +158,7 @@ class Microfacet : public Material {
     float chi = dot_mn > 0 ? 1 : 0;
 
     float result =
-        (chi / (M_PI * m_alpha_b * m_alpha_b * powf(cos(theta_m), 4))) *
+        (chi / (PI * m_alpha_b * m_alpha_b * powf(cos(theta_m), 4))) *
         exp(-powf(tan(theta_m), 2) / (m_alpha_b * m_alpha_b));
     return result;
   }

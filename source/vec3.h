@@ -4,10 +4,6 @@
 #include <cstdlib>
 #include <random>
 
-#ifdef _WIN32
-const float M_PI =
-#endif
-
 static const float PI = 3.1415926535f;
 static const float INV_PI = 1.0f / PI;
 static const float INV_2PI = 1.0f / (2.0f * PI);
@@ -160,14 +156,14 @@ static Vec3 reflect(const Vec3& wo, const Vec3& n) {
 
 static Vec3 UniformSampleHemisphere(float u1, float u2) {
   const float r = std::sqrt(1.0f - u1 * u1);
-  const float phi = 2 * M_PI * u2;
+  const float phi = 2 * PI * u2;
 
   return Vec3(cos(phi) * r, sin(phi) * r, u1);
 }
 
 static Vec3 CosineSampleHemisphere(float u, float v) {
   float z = sqrt(1 - v);
-  float phi = 2 * M_PI * u;
+  float phi = 2 * PI * u;
 
   float x = cos(phi) * 2 * sqrt(v);
   float y = sin(phi) * 2 * sqrt(v);
@@ -177,7 +173,7 @@ static Vec3 CosineSampleHemisphere(float u, float v) {
 
 static Vec3 CosineSampleHemispherePhong(float u, float v) {
   const float alpha = sqrtf(1.0f - u);
-  const float beta = 2 * M_PI * v;
+  const float beta = 2 * PI * v;
 
   const float x = alpha * cos(beta);
   const float y = alpha * sin(beta);
@@ -188,7 +184,7 @@ static Vec3 CosineSampleHemispherePhong(float u, float v) {
 
 static Vec3 CosineSampleHemisphereDriscoll(float u, float v) {
   const float r = sqrt(u);
-  const float theta = 2 * M_PI * v;
+  const float theta = 2 * PI * v;
 
   const float x = r * cos(theta);
   const float y = r * sin(theta);
@@ -228,7 +224,7 @@ static Vec3 CosineSampleHemispherePBRT(float u, float v) {
 }
 
 static Vec3 UniformSampleSphere(float u, float v) {
-  float theta = 2 * M_PI * u;
+  float theta = 2 * PI * u;
   float phi = acos(1 - 2 * v);
   float x = sin(phi) * cos(theta);
   float y = sin(phi) * sin(theta);
@@ -257,20 +253,3 @@ static bool refract(const Vec3& v, const Vec3& power, float ni_over_nt,
   }
 }
 
-inline static Vec3 SphericalDirection(float sinTheta, float cosTheta, float phi)
-{
-  return Vec3(sinTheta * std::cos(phi), sinTheta * std::sin(phi), cos(phi));
-}
-
-inline static float SphericalTheta(const Vec3 &v)
-{
-  return std::acos(clamp(v.z, 1, -1));
-}
-
-inline static float SphericalPhi(const Vec3 &v)
-{
-  float p = std::atan2(v.y, v.x);
-  return (p < 0) ? p + 2 * PI : p;
-}
-
-inline float AbsCosTheta(const Vec3& w) { return fabsf(w.y); }

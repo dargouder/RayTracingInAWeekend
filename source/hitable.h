@@ -2,14 +2,15 @@
 
 #include "ray.h"
 
-class Material;
+class BSDF;
 class HitRecord
 {
 public:
 	float t;
 	Vec3 p;
+  Vec3 wo;
 	Vec3 normal;
-	Material* mat_ptr;
+	BSDF *bsdf;
 };
 
 class Hitable {

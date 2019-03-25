@@ -43,7 +43,7 @@ class Phong : public Material {
     // generate a random number to see whether we will reflect with specular or
     // diffuse
     float reflectionDecision = RAND();
-    attenuation = m_kd / M_PI;
+    attenuation = m_kd / PI;
 
     if (reflectionDecision < diffuseRatio || diffuseRatio == 1.0f) {
       // calculating only diffuse component
@@ -61,7 +61,7 @@ class Phong : public Material {
 
       float sin_alpha = std::sqrt(1 - std::powf(u, 2.0f / (power + 1.0f)));
       float cos_alpha = std::powf(u, 1.0f / (power + 1));
-      float phi = 2 * M_PI * v;
+      float phi = 2 * PI * v;
       float cos_phi = std::cos(phi);
       float sin_phi = std::sin(phi);
 
@@ -71,7 +71,7 @@ class Phong : public Material {
 
       float cos_theta = Vec3::dot(scatteredDir, perfectReflection);
 
-      cos_theta = clamp(cos_theta, M_PI / 2.0f, -M_PI / 2.0f);
+      cos_theta = clamp(cos_theta, PI / 2.0f, -PI / 2.0f);
 
       pdf = (power + 2.0f) * INV_2PI * powf(cos_theta, power + 1.0f);
       attenuation += m_ks * (power + 2.0f) * INV_2PI * pow(cos_theta, power);

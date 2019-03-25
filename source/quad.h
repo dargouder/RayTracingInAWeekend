@@ -7,10 +7,11 @@ class Quad : public Hitable {
  public:
   Vec3 m_v00, m_v10, m_v11, m_v01;
 
-  std::unique_ptr<Material> material;
+  //std::unique_ptr<Material> material;
+  std::unique_ptr<BxDF> material;
 
   Quad() {}
-  Quad(Vec3 v00, Vec3 v10, Vec3 v11, Vec3 v01, std::unique_ptr<Material> mat)
+  Quad(Vec3 v00, Vec3 v10, Vec3 v11, Vec3 v01, std::unique_ptr<BxDF> mat)
       : m_v00(v00),
         m_v10(v10),
         m_v11(v11),
@@ -125,7 +126,7 @@ class Quad : public Hitable {
       return false;
     }
 
-    rec.mat_ptr = material.get();
+    rec.bxdf = material.get();
     rec.normal = Vec3::cross(m_v10 - m_v00, m_v01 - m_v00);
     rec.normal.make_unit_vector();
     rec.p = r.point_at_parameter(rec.t);  // + epsilon*rec.normal;
