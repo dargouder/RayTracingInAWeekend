@@ -51,8 +51,8 @@ class Microfacet : public Material {
                const float dot_i_n, Vec3& transmitted_ray, float& brdf,
                float& pdf) const {
     float refractive_index_ratio = m_eta_in / m_eta_out;
-    float sign_i_m = dot_i_m < 0 ? -1 : 1;
-    float sign_i_n = dot_i_n < 0 ? -1 : 1;
+    float sign_i_m = dot_i_m < 0 ? -1.0f : 1.0f;
+    float sign_i_n = dot_i_n < 0 ? -1.0f : 1.0f;
     float sqrt_res =
         sqrtf(1 + refractive_index_ratio * (sign_i_m * sign_i_m - 1));
     transmitted_ray = micro_normal * (refractive_index_ratio * dot_i_m -
@@ -82,7 +82,7 @@ class Microfacet : public Material {
     float v = RAND();
 
     float theta_m = atan(sqrtf(-(m_alpha_b * m_alpha_b * log(1 - u))));
-    float phi_m = 2 * M_PI * v;
+    float phi_m = 2 * PI * v;
 
     Vec3 microsurface_normal =
         Vec3(cos(theta_m) * cos(phi_m), sin(theta_m) * cos(phi_m), cos(phi_m));
@@ -155,10 +155,10 @@ class Microfacet : public Material {
 
   float BeckmannDistribution(Vec3 m, Vec3 power, float theta_m) const {
     float dot_mn = Vec3::dot(m, power);
-    float chi = dot_mn > 0 ? 1 : 0;
+    float chi = dot_mn > 0 ? 1.0f : 0.0f;
 
     float result =
-        (chi / (M_PI * m_alpha_b * m_alpha_b * powf(cos(theta_m), 4))) *
+        (chi / (PI * m_alpha_b * m_alpha_b * powf(cos(theta_m), 4))) *
         exp(-powf(tan(theta_m), 2) / (m_alpha_b * m_alpha_b));
     return result;
   }
@@ -169,3 +169,4 @@ class Microfacet : public Material {
   float m_alpha_b, m_ior;
   float m_eta_in, m_eta_out;
 };
+

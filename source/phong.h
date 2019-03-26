@@ -7,7 +7,7 @@
 class Phong : public Material {
  public:
   Phong(const Vec3& a, const Vec3& ks) : m_kd(a), m_ks(ks) {
-    power = 1;
+    power = 50;
     diffuseRatio =
         m_kd.getLuminance() / (m_kd.getLuminance() + m_ks.getLuminance());
     const Vec3 combined = m_kd + m_ks;
@@ -17,12 +17,14 @@ class Phong : public Material {
     assert(combined.b() <= 1);
   }
 
-  virtual Vec3 f(const Vec3& wo, const Vec3& wi) const { return Vec3(0.0f, 0.0f, 0.0f); }
+  virtual Vec3 f(const Vec3& wo, const Vec3& wi) const {
+    return Vec3(0.0f, 0.0f, 0.0f);
+  }
 
   bool sample_f(const Ray& r_in, const HitRecord& rec, Vec3& attenuation,
                 Ray& scattered, float& pdf) const {
     ONB onb;
-    onb.build_from_w(rec.normal);
+    onb.branchlessONB(rec.normal);
 
     // compute single luminance value to see how much we will reflect
     float diffuse_lum = m_kd.getLuminance();
@@ -41,7 +43,7 @@ class Phong : public Material {
     // generate a random number to see whether we will reflect with specular or
     // diffuse
     float reflectionDecision = RAND();
-    attenuation = m_kd / M_PI;
+    attenuation = m_kd / PI;
 
     if (reflectionDecision < diffuseRatio || diffuseRatio == 1.0f) {
       // calculating only diffuse component
@@ -51,7 +53,7 @@ class Phong : public Material {
       scatteredDir = onb.local(CosineSampleHemispherePhong(u, v));
       scatteredDir.make_unit_vector();
 
-      pdf = Vec3::dot(scatteredDir, rec.normal) / M_PI;
+      pdf = Vec3::dot(scatteredDir, rec.normal) * INV_PI;
     } else {
       // calculating only specular component
       float u = RAND();
@@ -59,7 +61,7 @@ class Phong : public Material {
 
       float sin_alpha = std::sqrt(1 - std::powf(u, 2.0f / (power + 1.0f)));
       float cos_alpha = std::powf(u, 1.0f / (power + 1));
-      float phi = 2 * M_PI * v;
+      float phi = 2.0f * PI * v;
       float cos_phi = std::cos(phi);
       float sin_phi = std::sin(phi);
 
@@ -67,21 +69,14 @@ class Phong : public Material {
           onb.local(Vec3(sin_alpha * cos_phi, sin_alpha * sin_phi, cos_alpha));
       scatteredDir.make_unit_vector();
 
-      float alpha = Vec3::dot(scatteredDir, perfectReflection);
+      float cos_theta = Vec3::dot(scatteredDir, perfectReflection);
 
-      alpha = clamp(alpha, M_PI / 2.0f, 0.0f);
+      cos_theta = clamp(cos_theta, PI / 2.0f, -PI / 2.0f);
 
-      if (alpha > 0) {
-        pdf = ((power + 1.0f) / (2.0f * M_PI)) * powf(alpha, power);
-      }
-
-      // calculate the fr
-      if (pdf > 0) {
-        attenuation +=
-            m_ks * (power + 2.0f) * (1.0f / (2.0f * M_PI)) * pow(alpha, power);
-      }
+      pdf = (power + 2.0f) * INV_2PI * powf(cos_theta, power + 1.0f);
+      attenuation += m_ks * (power + 2.0f) * INV_2PI * pow(cos_theta, power);
     }
-    //pdf = calcPdf(r_in.direction(), scatteredDir, rec.normal);
+    pdf = std::max(pdf, 0.00001f);
     scattered = Ray(rec.p, scatteredDir);
 
     return true;
@@ -94,8 +89,8 @@ class Phong : public Material {
     return 0;  // cos(theta) / M_PI;
   }
 
-  float calcPdf(const Vec3& wo, const Vec3& wi, const Vec3& normal) const {
-    const float diffusePDF = Vec3::dot(wi, normal) / M_PI;
+  float pdf(const Vec3& wo, const Vec3& wi) const {
+    // const float diffusePDF = Vec3::dot(wi, normal) / M_PI;
     return 0.0f;
   }
 

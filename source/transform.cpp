@@ -26,11 +26,11 @@ Transform Transform::Inverse(const Transform &m_transform) {
 }
 
 Transform Transform::Translate(const Vec3 &p_delta) {
-  Matrix4x4 m(1, 0, 0, p_delta.x(), 0, 1, 0, p_delta.y(), 0, 0, 1, p_delta.z(),
+  Matrix4x4 m(1, 0, 0, p_delta.x, 0, 1, 0, p_delta.y, 0, 0, 1, p_delta.z,
               0, 0, 0, 1);
 
-  Matrix4x4 minv(1, 0, 0, -p_delta.x(), 0, 1, 0, -p_delta.y(), 0, 0, 1,
-                 -p_delta.z(), 0, 0, 0, 1);
+  Matrix4x4 minv(1, 0, 0, -p_delta.x, 0, 1, 0, -p_delta.y, 0, 0, 1,
+                 -p_delta.z, 0, 0, 0, 1);
 
   return Transform(m, minv);
 }
@@ -41,7 +41,7 @@ Transform Transform::Perspective(float fov, float power, float f) {
                               -f * power / (f - power), 0, 0, 1, 0);
 
   // Scale to canonical viewing volume
-  float invTanAng = 1.f / tanf((fov * M_PI / 180.0) / 2.f);
+  float invTanAng = 1.f / tanf((fov * PI / 180.0) / 2.f);
   return Scale(invTanAng, invTanAng, 1) * Transform(persp);
 }
 
@@ -56,9 +56,9 @@ Matrix4x4 Transpose(const Matrix4x4 &p_matrix) {
 }
 
 Vec3 Transform::operator()(const Vec3 &p_vector) const {
-  float x = p_vector.x();
-  float y = p_vector.y();
-  float z = p_vector.z();
+  float x = p_vector.x;
+  float y = p_vector.y;
+  float z = p_vector.z;
 
   float xp = matrix.matrix[0][0] * x + matrix.matrix[0][1] * y +
              matrix.matrix[0][2] * z + matrix.matrix[0][3];
@@ -76,9 +76,9 @@ Vec3 Transform::operator()(const Vec3 &p_vector) const {
 }
 
 Vec3 Transform::DirectionTransform(const Vec3 &p_vector) const {
-  float x = p_vector.x();
-  float y = p_vector.y();
-  float z = p_vector.z();
+  float x = p_vector.x;
+  float y = p_vector.y;
+  float z = p_vector.z;
 
   float xp = matrix.matrix[0][0] * x + matrix.matrix[0][1] * y +
              matrix.matrix[0][2] * z;
@@ -103,16 +103,16 @@ Ray Transform::operator()(const Ray &p_ray) const {
 }
 
 Transform Transform::RotateX(float p_angle) {
-  float sin_t = sinf(M_PI / 180 * p_angle);
-  float cos_t = cosf((M_PI / 180 * p_angle));
+  float sin_t = sinf(PI / 180 * p_angle);
+  float cos_t = cosf((PI / 180 * p_angle));
 
   Matrix4x4 m(1, 0, 0, 0, 0, cos_t, -sin_t, 0, 0, sin_t, cos_t, 0, 0, 0, 0, 1);
 
   return Transform(m, m.Transpose());
 }
 Transform Transform::RotateY(float p_angle) {
-  float sin_t = sinf((M_PI / 180 * p_angle));
-  float cos_t = cosf((M_PI / 180 * p_angle));
+  float sin_t = sinf((PI / 180 * p_angle));
+  float cos_t = cosf((PI / 180 * p_angle));
 
   Matrix4x4 m(1, 0, 0, 0, 0, cos_t, -sin_t, 0, 0, sin_t, cos_t, 0, 0, 0, 0, 1);
 
@@ -120,8 +120,8 @@ Transform Transform::RotateY(float p_angle) {
 }
 Transform Transform::RotateZ(float p_angle) {
 
-  float sin_t = sinf((M_PI / 180 * p_angle));
-  float cos_t = cosf((M_PI / 180 * p_angle));
+  float sin_t = sinf((PI / 180 * p_angle));
+  float cos_t = cosf((PI / 180 * p_angle));
 
   Matrix4x4 m(1, 0, 0, 0, 0, cos_t, -sin_t, 0, 0, sin_t, cos_t, 0, 0, 0, 0, 1);
 
@@ -131,9 +131,9 @@ Transform Transform::RotateZ(float p_angle) {
 Transform Transform::LookAt(const Vec3 &pos, const Vec3 &look, const Vec3 &up) {
   float m[4][4];
   // Initialize fourth column of viewing matrix
-  m[0][3] = pos.x();
-  m[1][3] = pos.y();
-  m[2][3] = pos.z();
+  m[0][3] = pos.x;
+  m[1][3] = pos.y;
+  m[2][3] = pos.z;
   m[3][3] = 1;
 
   // Initialize first three columns of viewing matrix
@@ -148,17 +148,17 @@ Transform Transform::LookAt(const Vec3 &pos, const Vec3 &look, const Vec3 &up) {
   left = Vec3::cross(temp_up, dir);
   left.make_unit_vector();
   Vec3 newUp = Vec3::cross(dir, left);
-  m[0][0] = left.x();
-  m[1][0] = left.y();
-  m[2][0] = left.z();
+  m[0][0] = left.x;
+  m[1][0] = left.y;
+  m[2][0] = left.z;
   m[3][0] = 0.;
-  m[0][1] = newUp.x();
-  m[1][1] = newUp.y();
-  m[2][1] = newUp.z();
+  m[0][1] = newUp.x;
+  m[1][1] = newUp.y;
+  m[2][1] = newUp.z;
   m[3][1] = 0.;
-  m[0][2] = dir.x();
-  m[1][2] = dir.y();
-  m[2][2] = dir.z();
+  m[0][2] = dir.x;
+  m[1][2] = dir.y;
+  m[2][2] = dir.z;
   m[3][2] = 0.;
   Matrix4x4 camToWorld(m);
 

@@ -2,15 +2,17 @@
 
 #include <memory>
 #include "hitable.h"
+#include "reflection.h"
 
 class Quad : public Hitable {
  public:
   Vec3 m_v00, m_v10, m_v11, m_v01;
 
-  std::unique_ptr<Material> material;
+  //std::unique_ptr<Material> material;
+  std::unique_ptr<BxDF> material;
 
-  Quad() {}
-  Quad(Vec3 v00, Vec3 v10, Vec3 v11, Vec3 v01, std::unique_ptr<Material> mat)
+  Quad() = delete;
+  Quad(Vec3 v00, Vec3 v10, Vec3 v11, Vec3 v01, std::unique_ptr<BxDF> mat)
       : m_v00(v00),
         m_v10(v10),
         m_v11(v11),
@@ -77,17 +79,17 @@ class Quad : public Hitable {
     float alpha11, beta11;
 
     Vec3 N = Vec3::cross(E01, E03);
-    if ((std::abs(N.x()) >= std::abs(N.y())) &&
-        (std::abs(N.x()) >= std::abs(N.z()))) {
-      alpha11 = (E02.y() * E03.z() - E02.z() * E03.y()) / N.x();
-      beta11 = (E01.y() * E02.z() - E01.z() * E02.y()) / N.x();
-    } else if ((std::abs(N.y()) >= std::abs(N.x())) &&
-               (std::abs(N.y()) >= std::abs(N.z()))) {
-      alpha11 = (E02.z() * E03.x() - E02.x() * E03.z()) / N.y();
-      beta11 = (E01.z() * E02.x() - E01.x() * E02.z()) / N.y();
+    if ((std::abs(N.x) >= std::abs(N.y)) &&
+        (std::abs(N.x) >= std::abs(N.z))) {
+      alpha11 = (E02.y * E03.z - E02.z * E03.y) / N.x;
+      beta11 = (E01.y * E02.z - E01.z * E02.y) / N.x;
+    } else if ((std::abs(N.y) >= std::abs(N.x)) &&
+               (std::abs(N.y) >= std::abs(N.z))) {
+      alpha11 = (E02.z * E03.x - E02.x * E03.z) / N.y;
+      beta11 = (E01.z * E02.x - E01.x * E02.z) / N.y;
     } else {
-      alpha11 = (E02.x() * E03.y() - E02.y() * E03.x()) / N.z();
-      beta11 = (E01.x() * E02.y() - E01.y() * E02.x()) / N.z();
+      alpha11 = (E02.x * E03.y - E02.y * E03.x) / N.z;
+      beta11 = (E01.x * E02.y - E01.y * E02.x) / N.z;
     }
 
     // Compute the bilinear coordinaes of the intersection point
@@ -125,7 +127,7 @@ class Quad : public Hitable {
       return false;
     }
 
-    rec.mat_ptr = material.get();
+    rec.bsdf = std::make_unique<BSDF>(material.get());
     rec.normal = Vec3::cross(m_v10 - m_v00, m_v01 - m_v00);
     rec.normal.make_unit_vector();
     rec.p = r.point_at_parameter(rec.t);  // + epsilon*rec.normal;
