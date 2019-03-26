@@ -7,9 +7,9 @@ class Sphere : public Hitable {
  public:
   Vec3 center;
   float radius;
-  std::unique_ptr<BxDF> material;
+  std::unique_ptr<Material> material;
   Sphere() {}
-  Sphere(Vec3 cen, float r, std::unique_ptr<BxDF> mat)
+  Sphere(Vec3 cen, float r, std::unique_ptr<Material> mat)
       : center(cen), radius(r), material(std::move(mat)) {}
 
   bool hit(const Ray& r, float tmin, float tmax, HitRecord& rec) const {
@@ -26,8 +26,9 @@ class Sphere : public Hitable {
         rec.p = r.point_at_parameter(rec.t);
         rec.normal = (rec.p - center) / radius;
         rec.normal.make_unit_vector();
-        rec.bsdf = std::make_unique<BSDF>(material.get());
-        return true;
+        //rec.bsdf = std::make_unique<BSDF>(material.get());
+		rec.bsdf = material.get();
+       return true;
       }
 
       temp = (-b + sqrt(discriminant)) / a;
@@ -36,7 +37,8 @@ class Sphere : public Hitable {
         rec.p = r.point_at_parameter(rec.t);
         rec.normal = (rec.p - center) / radius;
         rec.normal.make_unit_vector();
-        rec.bsdf = std::make_unique<BSDF>(material.get());
+        //rec.bsdf = std::make_unique<BSDF>(material.get());
+        rec.bsdf = material.get();
         return true;
       }
     }

@@ -59,29 +59,32 @@ ONB shadingONB;
 
 Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
   HitRecord rec;
-  if (world.hit(ray, 0.001, FLT_MAX, rec)) {
+  if (world.hit(ray, 0.001f, FLT_MAX, rec)) {
     Ray scattered;
     Vec3 attenuation;
     float u = 0.0f, v = 0.0f;
     rec.normal.make_unit_vector();
-
+	Vec3 f; 
+	float pdf;
     // return rec.bxdf->f(Vec3(), Vec3());
 
-    if (depth < 10) {
+    if (depth < 10 &&  rec.bsdf->sample_f(ray, rec, f, scattered, pdf)) {
       Vec3 wo = shadingONB.local(-ray.direction());
       wo.make_unit_vector();
       Vec3 wi;
       float pdf;
 
-      Vec3 f = rec.bsdf->bxdf->Sample_f(wo, wi, pdf);
+
+      //Vec3 f = rec.bsdf->bxdf->Sample_f(wo, wi, pdf);
       // wi.make_unit_vector();
-      f = f * AbsCosTheta(wi) / pdf;
+
+      //f = f * AbsCosTheta(wi) / pdf;
 
       assert(pdf > 0);
       ONB shapeONB;
       shapeONB.branchlessONB(rec.normal);
       Vec3 origin = rec.p + rec.normal * 0.001f;
-      scattered = Ray(origin, shapeONB.local(wi));
+      scattered = Ray(origin, scattered.B);
       // scattered.B.make_unit_vector();
       return f * colourRecursive(scattered, world, depth + 1);
     } else {
@@ -90,7 +93,7 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
   } else {
     Vec3 unit_direction = Vec3::unit_vector(ray.direction());
     float t = 0.5f * (unit_direction.y + 1.0f);
-    Vec3 col = (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
+    Vec3 col = (1.0f - t) * Vec3(1.0f, 1.0f, 1.0f) + t * Vec3(0.5f, 0.7f, 1.0f);
     return col;
   }
 }
@@ -159,7 +162,7 @@ void CornellBox(HitableList &list, Hitable *light) {
   list.list.push_back(std::make_unique<Quad>(
       Vec3(556.0f, 548.8f, 0.0f), Vec3(556.0f, 548.8f, 559.2f),
       Vec3(0.0f, 548.8f, 559.2f), Vec3(0.0f, 548.8f, 0.0f),
-      std::make_unique<LambertianReflection>(Vec3(0.725f, 0.71f, 0.68f))));
+      std::make_unique<Lambertian>(Vec3(0.725f, 0.71f, 0.68f))));
 
   // back wall
    //list.list.push_back(std::make_unique<Quad>(
@@ -171,13 +174,13 @@ void CornellBox(HitableList &list, Hitable *light) {
   list.list.push_back(std::make_unique<Quad>(
       Vec3(0.0f, 0.0f, 559.2f), Vec3(0.0f, 0.0f, 0.0f),
       Vec3(0.0f, 548.8f, 0.0f), Vec3(0.0f, 548.8f, 559.2f),
-      std::make_unique<LambertianReflection>(Vec3(0.14f, 0.45f, 0.091f))));
+      std::make_unique<Lambertian>(Vec3(0.14f, 0.45f, 0.091f))));
 
   // left wall
   list.list.push_back(std::make_unique<Quad>(
       Vec3(549.6f, 0.0f, 0.0f), Vec3(549.6f, 0.0f, 559.2f),
       Vec3(549.6f, 548.8f, 559.2f), Vec3(549.6f, 548.8f, 0.0f),
-      std::make_unique<LambertianReflection>(Vec3(0.63f, 0.065f, 0.05f))));
+      std::make_unique<Lambertian>(Vec3(0.63f, 0.065f, 0.05f))));
 
   // short block
   // list.list.push_back(std::make_unique<Quad>(

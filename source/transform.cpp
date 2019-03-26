@@ -41,7 +41,7 @@ Transform Transform::Perspective(float fov, float power, float f) {
                               -f * power / (f - power), 0, 0, 1, 0);
 
   // Scale to canonical viewing volume
-  float invTanAng = 1.f / tanf((fov * PI / 180.0) / 2.f);
+  float invTanAng = 1.f / tanf((fov * PI / 180.0f) / 2.f);
   return Scale(invTanAng, invTanAng, 1) * Transform(persp);
 }
 

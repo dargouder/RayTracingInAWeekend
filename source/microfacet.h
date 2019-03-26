@@ -41,7 +41,7 @@ class Microfacet : public Material {
     reflected_ray.make_unit_vector();
 
     Vec3 reflection_half_vec =
-        copysign(1, Vec3::dot(incident_ray, macro_normal)) *
+        copysign(1.0f, Vec3::dot(incident_ray, macro_normal)) *
         (incident_ray + reflected_ray);
     reflection_half_vec.make_unit_vector();
   }
@@ -82,7 +82,7 @@ class Microfacet : public Material {
     float v = RAND();
 
     float theta_m = atan(sqrtf(-(m_alpha_b * m_alpha_b * log(1 - u))));
-    float phi_m = 2 * PI * v;
+    float phi_m = 2.0f * PI * v;
 
     Vec3 microsurface_normal =
         Vec3(cos(theta_m) * cos(phi_m), sin(theta_m) * cos(phi_m), cos(phi_m));

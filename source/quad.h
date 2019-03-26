@@ -9,10 +9,10 @@ class Quad : public Hitable {
   Vec3 m_v00, m_v10, m_v11, m_v01;
 
   //std::unique_ptr<Material> material;
-  std::unique_ptr<BxDF> material;
+  std::unique_ptr<Material> material;
 
   Quad() = delete;
-  Quad(Vec3 v00, Vec3 v10, Vec3 v11, Vec3 v01, std::unique_ptr<BxDF> mat)
+  Quad(Vec3 v00, Vec3 v10, Vec3 v11, Vec3 v01, std::unique_ptr<Material> mat)
       : m_v00(v00),
         m_v10(v10),
         m_v11(v11),
@@ -20,7 +20,7 @@ class Quad : public Hitable {
         material(std::move(mat)) {}
 
   bool hit(const Ray& r, float tmin, float tmax, HitRecord& rec) const {
-    const float epsilon = 1e-6;
+    const float epsilon = 1e-6f;
     float u, v;
     // Reject rays using the barycentric coordinates of the intersection point
     // with respect to T
@@ -127,7 +127,7 @@ class Quad : public Hitable {
       return false;
     }
 
-    rec.bsdf = std::make_unique<BSDF>(material.get());
+    rec.bsdf = material.get(); //std::make_unique<Material>(material.get());
     rec.normal = Vec3::cross(m_v10 - m_v00, m_v01 - m_v00);
     rec.normal.make_unit_vector();
     rec.p = r.point_at_parameter(rec.t);  // + epsilon*rec.normal;

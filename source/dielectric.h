@@ -25,7 +25,7 @@ public:
 		} else 
 		{
 			outward_normal = rec.normal;
-			ni_over_nt = 1.0 / refl_idx;
+			ni_over_nt = 1.0f / refl_idx;
 			cosine = -Vec3::dot(r_in.direction(), rec.normal) / r_in.direction().length();
 		}
 
