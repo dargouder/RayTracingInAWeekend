@@ -21,5 +21,5 @@ public:
 
 inline Vec3 OffsetRayOrigin(const Vec3 &p, const Vec3 &pError, const Vec3 &normal, const Vec3 &w)
 {
-
+ return Vec3(0,0,0);
 }

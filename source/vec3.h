@@ -219,13 +219,13 @@ static Vec3 ConcentricSampleDisk(float u, float v) {
 static Vec3 CosineSampleHemispherePBRT(float u, float v) {
   Vec3 d = ConcentricSampleDisk(u, v);
   float z = std::sqrt(std::max(
-      (float)0, 1 - d.x * d.x - d.y * d.y));
+      (float)0.0f, 1.0f - d.x * d.x - d.y * d.y));
   return Vec3(d.x, d.y, z);
 }
 
 static Vec3 UniformSampleSphere(float u, float v) {
-  float theta = 2 * PI * u;
-  float phi = acos(1 - 2 * v);
+  float theta = 2.0f * PI * u;
+  float phi = acos(1.0f - 2.0f * v);
   float x = sin(phi) * cos(theta);
   float y = sin(phi) * sin(theta);
   float z = cos(phi);
@@ -235,8 +235,8 @@ static Vec3 UniformSampleSphere(float u, float v) {
 static Vec3 RandomInUnitSphere() {
   Vec3 p;
   do {
-    p = 2.0 * Vec3(RAND(), RAND(), RAND()) - Vec3(1, 1, 1);
-  } while (Vec3::dot(p, p) >= 1.0);
+    p = 2.0f * Vec3(RAND(), RAND(), RAND()) - Vec3(1.0f, 1.0f, 1.0f);
+  } while (Vec3::dot(p, p) >= 1.0f);
   return p;
 }
 
@@ -244,7 +244,7 @@ static bool refract(const Vec3& v, const Vec3& power, float ni_over_nt,
                     Vec3& refracted) {
   Vec3 uv = Vec3::unit_vector(v);
   float dt = Vec3::dot(uv, power);
-  float discriminant = 1.0 - ni_over_nt * ni_over_nt * (1 - dt * dt);
+  float discriminant = 1.0f - ni_over_nt * ni_over_nt * (1.0f - dt * dt);
   if (discriminant > 0) {
     refracted = ni_over_nt * (uv - power * dt) - power * sqrt(discriminant);
     return true;

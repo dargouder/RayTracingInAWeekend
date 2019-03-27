@@ -1,55 +1,49 @@
 #pragma once
 
-#include "hitable.h"
 #include <memory>
+#include "hitable.h"
 
 class Sphere : public Hitable {
-public:
-	Vec3 center;
-	float radius;
-	std::unique_ptr<BxDF> material;
-	Sphere() {}
-	Sphere(Vec3 cen, float r, std::unique_ptr<BxDF> mat) : center(cen), radius(r), material(std::move(mat)) {}
+ public:
+  Vec3 center;
+  float radius;
+  std::unique_ptr<BxDF> material;
+  Sphere() {}
+  Sphere(Vec3 cen, float r, std::unique_ptr<BxDF> mat)
+      : center(cen), radius(r), material(std::move(mat)) {}
 
-	bool hit(const Ray& r, float tmin, float tmax, HitRecord& rec) const {
-		Vec3 oc = r.origin() - center;
-		float a = Vec3::dot(r.direction(), r.direction());
-		float b = Vec3::dot(oc, r.direction());
-		float c = Vec3::dot(oc,oc) - radius*radius;
-		float discriminant = b*b - a*c;
+  bool hit(const Ray& r, float tmin, float tmax, HitRecord& rec) const {
+    Vec3 oc = r.origin() - center;
+    float a = Vec3::dot(r.direction(), r.direction());
+    float b = Vec3::dot(oc, r.direction());
+    float c = Vec3::dot(oc, oc) - radius * radius;
+    float discriminant = b * b - a * c;
 
-		if (discriminant > 0) {
-			float temp = (-b - sqrt(discriminant)) / a;
-			if (temp < tmax && temp > tmin) {
-				rec.t = temp;
-				rec.p = r.point_at_parameter(rec.t);
-				rec.normal = (rec.p - center) / radius;
-                rec.normal.make_unit_vector();
-				rec.bxdf = material.get();
-				return true;
-			}
-		
-			temp = (-b + sqrt(discriminant))/a;
-			if(temp < tmax && temp > tmin) {
-				rec.t = temp;
-				rec.p = r.point_at_parameter(rec.t);
-				rec.normal = (rec.p - center) / radius;
-                rec.normal.make_unit_vector();
-				rec.bxdf = material.get();
-				return true;
-			}
-		}
-		return false;
-	}
+    if (discriminant > 0) {
+      float temp = (-b - sqrt(discriminant)) / a;
+      if (temp < tmax && temp > tmin) {
+        rec.t = temp;
+        rec.p = r.point_at_parameter(rec.t);
+        rec.normal = (rec.p - center) / radius;
+        rec.normal.make_unit_vector();
+        rec.bsdf = std::make_unique<BSDF>(material.get());
+        return true;
+      }
 
-  Vec3 generateSampleOnSurface() const
-  {
-    return Vec3(0.0f, 0.0f, 0.0f);
+      temp = (-b + sqrt(discriminant)) / a;
+      if (temp < tmax && temp > tmin) {
+        rec.t = temp;
+        rec.p = r.point_at_parameter(rec.t);
+        rec.normal = (rec.p - center) / radius;
+        rec.normal.make_unit_vector();
+        rec.bsdf = std::make_unique<BSDF>(material.get());
+        return true;
+      }
+    }
+    return false;
   }
 
-  float Pdf() const
-  {
-    return 4 * PI * radius * radius;
-  }
+  Vec3 generateSampleOnSurface() const { return Vec3(0.0f, 0.0f, 0.0f); }
 
+  float Pdf() const { return 4 * PI * radius * radius; }
 };

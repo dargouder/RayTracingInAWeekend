@@ -61,7 +61,7 @@ class Phong : public Material {
 
       float sin_alpha = std::sqrt(1 - std::powf(u, 2.0f / (power + 1.0f)));
       float cos_alpha = std::powf(u, 1.0f / (power + 1));
-      float phi = 2 * PI * v;
+      float phi = 2.0f * PI * v;
       float cos_phi = std::cos(phi);
       float sin_phi = std::sin(phi);
 

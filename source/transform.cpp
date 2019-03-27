@@ -1,4 +1,4 @@
-#pragma once
+
 #include "transform.h"
 #include "vec3.h"
 //const float M_PI = 3.142;

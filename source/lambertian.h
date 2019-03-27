@@ -7,7 +7,7 @@ class Lambertian : public Material {
 public:
     explicit Lambertian(const Vec3 &a) : m_kd(a) {}
 
-    virtual Vec3 f(const Vec3& wo, const Vec3& wi) const
+    virtual Vec3 f(const Vec3& wo, const Vec3& wi) const override
     {
       return Vec3(0,0,0);
     }

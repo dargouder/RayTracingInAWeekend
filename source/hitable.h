@@ -10,7 +10,7 @@ public:
 	Vec3 p;
   Vec3 wo;
 	Vec3 normal;
-	BSDF *bsdf;
+	std::unique_ptr<BSDF> bsdf;
 };
 
 class Hitable {

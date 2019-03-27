@@ -73,9 +73,10 @@ Vec3 colourRecursive(const Ray &ray, const Hitable &world, int depth) {
       Vec3 wi;
       float pdf;
 
-      Vec3 f = rec.bxdf->Sample_f(wo, wi, pdf);
+      Vec3 f = rec.bsdf->bxdf->Sample_f(wo, wi, pdf);
       // wi.make_unit_vector();
       f = f * AbsCosTheta(wi) / pdf;
+
       assert(pdf > 0);
       ONB shapeONB;
       shapeONB.branchlessONB(rec.normal);
@@ -160,11 +161,12 @@ void CornellBox(HitableList &list, Hitable *light) {
       Vec3(0.0f, 548.8f, 559.2f), Vec3(0.0f, 548.8f, 0.0f),
       std::make_unique<LambertianReflection>(Vec3(0.725f, 0.71f, 0.68f))));
 
+
   // back wall
-  // list.list.push_back(std::make_unique<Quad>(
-  //    Vec3(549.6f, 0.0f, 559.2f), Vec3(0.0f, 0.0f, 559.2f),
-  //    Vec3(0.0f, 548.8f, 559.2f), Vec3(556.6f, 548.8f, 559.2f),
-  //    std::make_unique<LambertianReflection>(Vec3(0.725f, 0.71f, 0.68f))));
+   //list.list.push_back(std::make_unique<Quad>(
+   //   Vec3(549.6f, 0.0f, 559.2f), Vec3(0.0f, 0.0f, 559.2f),
+   //   Vec3(0.0f, 548.8f, 559.2f), Vec3(556.6f, 548.8f, 559.2f),
+   //   std::make_unique<LambertianReflection>(Vec3(0.725f, 0.71f, 0.68f))));
 
   // right wall
   list.list.push_back(std::make_unique<Quad>(

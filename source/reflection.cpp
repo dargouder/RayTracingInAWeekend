@@ -17,3 +17,4 @@ float BxDF::Pdf(const Vec3 &wo, const Vec3 &wi) const {
   // Since our local normal is (0, 0, 1), we can use the utility BXDF functions
   return SameHemisphere(wo, wi) ? AbsCosTheta(wi) * INV_PI : 0;
 }
+

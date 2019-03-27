@@ -78,8 +78,7 @@ inline float Cos2Phi(const Vec3 &w) { return CosPhi(w) * CosPhi(w); }
 inline float Sin2Phi(const Vec3 &w) { return SinPhi(w) * SinPhi(w); }
 
 // used to check if the wo and wi lie on the same hemisphere.
-inline bool SameHemisphere(const Vec3 &w, const Vec3 &wp)
-{
+inline bool SameHemisphere(const Vec3 &w, const Vec3 &wp) {
   return w.z * wp.z > 0;
 }
 
@@ -98,46 +97,43 @@ class BxDF {
   // Computes the pdf for the given wo and wi.
   virtual float Pdf(const Vec3 &wo, const Vec3 &wi) const;
 
-  virtual bool isLight()
-  {
-    return false;
-  }
+  virtual bool isLight() { return false; }
+
+   ~BxDF() = default;
+
 };
 
 class LambertianReflection : public BxDF {
  public:
   // Public methods
-  LambertianReflection(Vec3 kd) : m_kd(kd) {}
+  explicit LambertianReflection(Vec3 kd) : m_kd(kd) {}
 
   Vec3 f(const Vec3 &wo, const Vec3 &wi) const { return m_kd / PI; }
-
+  ~LambertianReflection() = default;
  private:
   // private data
   const Vec3 m_kd;
+
+
 };
 
-
-
 class AreaLight : public BxDF {
-public:
+ public:
   AreaLight(Vec3 a) : emit(a) {}
 
-  Vec3 f(const Vec3 &wo, const Vec3 &wi) const
-  {
-    return emit;
-  }
+  Vec3 f(const Vec3 &wo, const Vec3 &wi) const override { return emit; }
 
-  bool isLight() override
-  {
-    return true;
-  }
+  bool isLight() override { return true; }
 
-private:
+ private:
   Vec3 emit;
 };
 
-class BSDF
-{
+class BSDF {
+ public:
+  BSDF(BxDF *pbxdf) : bxdf(pbxdf) {}
+
+
   BxDF *bxdf;
 
   // shading normal, shading tangent, shading bitangent
