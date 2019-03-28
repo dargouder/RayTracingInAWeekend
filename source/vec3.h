@@ -27,8 +27,8 @@ inline float schlick(float cosine, float ref_idx) {
   return r0 + (1 - r0) * cos_res * cos_res * cos_res * cos_res * cos_res;
 }
 
-inline float clamp(float power, float max, float min) {
-  return std::min(max, std::max(min, power));
+inline float clamp(float num, float max, float min) {
+  return std::min(max, std::max(min, num));
 }
 
 class Vec3 {

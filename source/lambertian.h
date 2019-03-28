@@ -2,6 +2,7 @@
 
 #include "material.h"
 #include "onb.h"
+#include "reflection.h"
 
 class Lambertian : public Material {
  public:
@@ -13,25 +14,24 @@ class Lambertian : public Material {
                 Ray &scattered, float &pdf) const override {
     ONB onb, shadingONB;
     shadingONB.branchlessONB(Vec3(0, 0, 1));
+    
     onb.branchlessONB(rec.normal);
 
-	Vec3 wo = shadingONB.local(-r_in.direction());
+    Vec3 wo = -r_in.direction();
 
     float u = RAND();
     float v = RAND();
     Vec3 wi = CosineSampleHemispherePBRT(u, v);
-	if ( wo.z < 0 )
-	{
-		wi.z *= -1;
-	}
+    //if (wo.z < 0.0f) {
+    //  wi.z *= -1;
+    //}
 
-  
     Vec3 target = Vec3::unit_vector(onb.local(wi));
 
     scattered = Ray(rec.p, target);
     attenuation = m_kd / PI;
     attenuation = m_kd;
-    pdf = std::abs(Vec3::dot(rec.normal, scattered.direction())) / PI;
+    pdf = SameHemisphere(wo, wi) ? std::abs(Vec3::dot(rec.normal, scattered.direction())) / PI  : 0;
     float untransformedPdf = std::fabsf(wi.z) / PI;
     return true;
   }
