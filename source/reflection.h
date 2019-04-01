@@ -98,25 +98,30 @@ class BxDF {
   virtual float Pdf(const Vec3 &wo, const Vec3 &wi) const;
 
   virtual bool isLight() { return false; }
+
+   ~BxDF() = default;
+
 };
 
 class LambertianReflection : public BxDF {
  public:
   // Public methods
-  LambertianReflection(Vec3 kd) : m_kd(kd) {}
+  explicit LambertianReflection(Vec3 kd) : m_kd(kd) {}
 
   Vec3 f(const Vec3 &wo, const Vec3 &wi) const { return m_kd / PI; }
-
+  ~LambertianReflection() = default;
  private:
   // private data
   const Vec3 m_kd;
+
+
 };
 
 class AreaLight : public BxDF {
  public:
   AreaLight(Vec3 a) : emit(a) {}
 
-  Vec3 f(const Vec3 &wo, const Vec3 &wi) const { return emit; }
+  Vec3 f(const Vec3 &wo, const Vec3 &wi) const override { return emit; }
 
   bool isLight() override { return true; }
 

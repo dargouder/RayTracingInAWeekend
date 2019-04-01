@@ -144,8 +144,8 @@ class Vec3 {
 inline Vec3 RandomInUnitDisk() {
   Vec3 p;
   do {
-    p = 2.0f * Vec3(RAND(), RAND(), 0.0f) - Vec3(1.0f, 1.0f, 0.0f);
-  } while (Vec3::dot(p, p) >= 1.0f);
+    p = 2.0 * Vec3(RAND(), RAND(), 0) - Vec3(1, 1, 0);
+  } while (Vec3::dot(p, p) >= 1.0);
 
   return p;
 }
